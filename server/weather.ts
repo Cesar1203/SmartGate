@@ -8,16 +8,42 @@ function extractAirportCode(destination: string): string {
   return match ? match[1] : destination;
 }
 
-// Airport coordinates for major airports
+// Airport coordinates for major airports worldwide
 const airportCoordinates: Record<string, { lat: number; lon: number }> = {
+  // USA
   JFK: { lat: 40.6413, lon: -73.7781 },
   LAX: { lat: 33.9416, lon: -118.4085 },
   ORD: { lat: 41.9742, lon: -87.9073 },
   ATL: { lat: 33.6407, lon: -84.4277 },
   DFW: { lat: 32.8998, lon: -97.0403 },
   MIA: { lat: 25.7959, lon: -80.2870 },
+  SFO: { lat: 37.6213, lon: -122.3790 },
+  SEA: { lat: 47.4502, lon: -122.3088 },
+  LAS: { lat: 36.0840, lon: -115.1537 },
+  
+  // Europe
   LHR: { lat: 51.4700, lon: -0.4543 },
   CDG: { lat: 49.0097, lon: 2.5479 },
+  AMS: { lat: 52.3105, lon: 4.7683 },
+  FRA: { lat: 50.0379, lon: 8.5622 },
+  MAD: { lat: 40.4719, lon: -3.5626 },
+  BCN: { lat: 41.2974, lon: 2.0833 },
+  
+  // Mexico
+  MEX: { lat: 19.4363, lon: -99.0721 },
+  CUN: { lat: 21.0365, lon: -86.8771 },
+  GDL: { lat: 20.5218, lon: -103.3119 },
+  MTY: { lat: 25.7785, lon: -100.1069 },
+  
+  // South America
+  GRU: { lat: -23.4356, lon: -46.4731 },
+  EZE: { lat: -34.8222, lon: -58.5358 },
+  
+  // Asia
+  NRT: { lat: 35.7720, lon: 140.3929 },
+  HKG: { lat: 22.3080, lon: 113.9185 },
+  SIN: { lat: 1.3644, lon: 103.9915 },
+  DXB: { lat: 25.2532, lon: 55.3657 },
 };
 
 export async function getWeatherData(destination: string, dateTime: Date): Promise<WeatherData> {
