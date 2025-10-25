@@ -1,0 +1,95 @@
+Please refactor the SmartCater project to align with the real GateGroup “Pick & Pack” process and the official Smart Execution track from HackMTY 2025.
+
+🧠 Core Mission
+
+Build a smart execution system that helps GateGroup’s employees work faster, make fewer mistakes, and react efficiently to last-minute flight or weather changes — fully aligned with real Pick & Pack operations.
+
+🧩 Real Process Integration
+
+Implement SmartCater as a digital tool that assists during the Preparation + Assembly phases of Pick & Pack:
+
+Guides employees through the correct “specification” (product list per flight).
+
+Detects errors before sealing drawers or trolleys.
+
+Automates decisions about bottles and food reassignment.
+
+Adjusts quantities dynamically based on flight reliability and expiration.
+
+✈️ Functional Modules
+
+Alcohol Bottle Handling
+
+Photo upload or camera capture of a bottle.
+
+Vision AI (simulated or real) estimates fill %.
+
+Apply contract-based rules (JSON editable per airline):
+
+>70% → reuse, 40–70% → combine, <40% → discard.
+
+Log action + confidence level + airline ID.
+
+Real-Time Error Detection
+
+Upload trolley image.
+
+Compare vs “golden layout” template.
+
+Simulate visual feedback: missing/wrong/extra item.
+
+No slowdown for employees; instant feedback on screen.
+
+Employee Efficiency
+
+Dashboard tracking time per trolley, errors, and accuracy.
+
+Step-by-step checklist for each spec.
+
+Simple gamification (progress bar, performance score).
+
+Flight Reliability + Weather Module
+
+Integrate or simulate weather API.
+
+Compute probability of on-time departure.
+
+Suggest load adjustments (e.g., “reduce 30% fresh items if < 60% reliability”).
+
+Automatic Reassignment
+
+If a flight is delayed/cancelled → reassign only to flights of the same airline within 6 hours.
+
+If no same-airline match → mark food as “Expiring Soon.”
+
+Log action visibly in dashboard (🟢 reassigned / 🔴 expired).
+
+⚙️ Architecture
+
+Frontend: React + Tailwind (clean GateGroup orange/gray/white theme).
+
+Backend: FastAPI or Express.
+
+DB: PostgreSQL / SQLite for mock.
+
+AI simulation: YOLOv8 or mock function for fill %, SSIM for image comparison.
+
+Demo mode: offline simulation (no API keys required).
+
+🎯 Demo Mode
+
+Preload 3 airlines (AMX, LH, AA) each with their own rules/specs.
+
+Random weather and bottle data for demonstration.
+
+Show dashboards with flights, reliability %, and employee metrics.
+
+✅ Success Criteria
+
+Follows GateGroup’s Pick & Pack logic and airline segregation rule.
+
+Reduces manual decision time.
+
+Provides clear, instant feedback to workers.
+
+Demonstrates speed, accuracy, sustainability, and employee usability.
