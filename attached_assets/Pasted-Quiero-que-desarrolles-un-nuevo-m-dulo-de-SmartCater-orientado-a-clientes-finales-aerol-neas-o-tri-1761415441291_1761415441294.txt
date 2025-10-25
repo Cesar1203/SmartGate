@@ -1,0 +1,79 @@
+Quiero que desarrolles un nuevo módulo de SmartCater, orientado a clientes finales (aerolíneas o tripulación), donde puedan solicitar productos alimenticios y bebidas y el sistema integre predicción de clima y confiabilidad de vuelo.
+
+🔹 Funcionalidades principales
+
+Formulario de solicitud de productos
+
+Los clientes pueden introducir:
+
+Número de vuelo
+
+Aerolínea
+
+Fecha y hora de salida
+
+Cantidad de cada producto (comida fresca, snacks, bebidas)
+
+Validación básica de datos antes de enviar.
+
+Procesamiento de datos de vuelo
+
+El sistema recibe el vuelo y hora ingresados.
+
+Consulta un API de vuelos (real o mock) para verificar horarios y aerolínea.
+
+Consulta un API de clima para ese aeropuerto y hora (OpenWeather, AccuWeather, etc.).
+
+Calcula la probabilidad de salida a tiempo / confiabilidad del vuelo usando una fórmula simple o ML ligero.
+
+Sugerencia de carga optimizada
+
+Basado en la probabilidad calculada, el sistema muestra al cliente:
+
+Cantidad recomendada de cada producto para minimizar desperdicio.
+
+Mensajes claros tipo:
+
+“Alta confiabilidad → carga completa recomendada”
+
+“Riesgo moderado → sugerimos reducir 30% la comida fresca”
+
+“Riesgo alto → solo pedidos esenciales”.
+
+Confirmación y registro
+
+El cliente confirma la orden.
+
+Los datos se guardan en la base de datos para que el módulo principal de SmartCater pueda procesarlos (replanificación, asignación a trolleys, alertas).
+
+Mostrar un resumen de la orden con porcentaje de confiabilidad y recomendaciones de ajuste.
+
+Dashboard cliente (opcional)
+
+Lista de vuelos solicitados
+
+Estado de procesamiento (pendiente, confirmado, reasignado)
+
+Probabilidad de cancelación y ajustes sugeridos
+
+⚙️ Tecnologías sugeridas
+
+Frontend: React / Next.js para web app o app móvil
+
+Backend: FastAPI o Node.js
+
+Base de datos: PostgreSQL, Firebase o SQLite
+
+API externas: OpenWeatherMap o WeatherAPI + mock de vuelos
+
+Notificaciones: WebSocket o push notifications para actualizaciones
+
+💡 Extras opcionales
+
+Validación automática de productos disponibles según inventario
+
+Posibilidad de generar PDF o email de confirmación de pedido
+
+Previsualización de recomendaciones antes de confirmar la orden
+
+Integración futura con el módulo interno de SmartCater para replanificación automática
