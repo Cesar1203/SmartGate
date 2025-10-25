@@ -9,11 +9,39 @@ import {
   type InsertTrolleyVerification,
   type Order,
   type InsertOrder,
+  type Reassignment,
+  type InsertReassignment,
   type DashboardMetrics,
   type TrendData,
   type EmployeeMetric,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+
+// Utility function to extract airline code from flight number or airline name
+export function extractAirlineCode(flightNumber: string, airlineName: string): string {
+  // Try to extract from flight number first (e.g., "AM651" -> "AM", "UA1234" -> "UA")
+  const flightCodeMatch = flightNumber.match(/^([A-Z]{2,3})/);
+  if (flightCodeMatch) {
+    return flightCodeMatch[1];
+  }
+  
+  // Fallback to airline name mapping
+  const airlineMap: Record<string, string> = {
+    "AeroMexico": "AM",
+    "Aeromexico": "AM",
+    "United": "UA",
+    "United Airlines": "UA",
+    "American Airlines": "AA",
+    "American": "AA",
+    "Delta": "DL",
+    "Delta Airlines": "DL",
+    "Southwest": "WN",
+    "Southwest Airlines": "WN",
+    "Lufthansa": "LH",
+  };
+  
+  return airlineMap[airlineName] || airlineName.substring(0, 2).toUpperCase();
+}
 
 export interface IStorage {
   // Flight operations
@@ -45,6 +73,11 @@ export interface IStorage {
   updateOrderStatus(id: string, status: string): Promise<Order | undefined>;
   deleteOrder(id: string): Promise<boolean>;
 
+  // Reassignment operations
+  getReassignments(): Promise<Reassignment[]>;
+  createReassignment(reassignment: InsertReassignment): Promise<Reassignment>;
+  findCompatibleFlight(delayedFlight: Flight, allFlights: Flight[]): Promise<Flight | null>;
+
   // Metrics
   getDashboardMetrics(): Promise<DashboardMetrics>;
   getEfficiencyTrend(): Promise<TrendData[]>;
@@ -62,6 +95,7 @@ export class MemStorage implements IStorage {
   private bottleAnalyses: BottleAnalysis[];
   private trolleyVerifications: TrolleyVerification[];
   private orders: Map<string, Order>;
+  private reassignments: Reassignment[];
 
   constructor() {
     this.flights = new Map();
@@ -69,6 +103,7 @@ export class MemStorage implements IStorage {
     this.bottleAnalyses = [];
     this.trolleyVerifications = [];
     this.orders = new Map();
+    this.reassignments = [];
   }
 
   // Flight operations
@@ -236,6 +271,61 @@ export class MemStorage implements IStorage {
 
   async deleteOrder(id: string): Promise<boolean> {
     return this.orders.delete(id);
+  }
+
+  // Reassignment operations
+  async getReassignments(): Promise<Reassignment[]> {
+    return this.reassignments.sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+  }
+
+  async createReassignment(insertReassignment: InsertReassignment): Promise<Reassignment> {
+    const id = randomUUID();
+    const reassignment: Reassignment = {
+      id,
+      fromFlightNumber: insertReassignment.fromFlightNumber,
+      toFlightNumber: insertReassignment.toFlightNumber ?? null,
+      airline: insertReassignment.airline,
+      airlineCode: insertReassignment.airlineCode,
+      mealsReassigned: insertReassignment.mealsReassigned || 0,
+      bottlesReassigned: insertReassignment.bottlesReassigned || 0,
+      status: insertReassignment.status as any,
+      reason: insertReassignment.reason ?? null,
+      timestamp: new Date(),
+    };
+    this.reassignments.push(reassignment);
+    return reassignment;
+  }
+
+  async findCompatibleFlight(delayedFlight: Flight, allFlights: Flight[]): Promise<Flight | null> {
+    const delayedAirlineCode = extractAirlineCode(delayedFlight.flightNumber, delayedFlight.airline);
+    const now = new Date();
+    const sixHoursFromNow = new Date(now.getTime() + 6 * 60 * 60 * 1000);
+
+    // Filter flights by:
+    // 1. Same airline code
+    // 2. Scheduled status
+    // 3. Departing within 6 hours
+    const compatibleFlights = allFlights.filter((flight) => {
+      if (flight.id === delayedFlight.id) return false;
+      if (flight.status !== "scheduled") return false;
+      
+      const flightAirlineCode = extractAirlineCode(flight.flightNumber, flight.airline);
+      if (flightAirlineCode !== delayedAirlineCode) return false;
+
+      const departureTime = new Date(flight.departureTime);
+      return departureTime > now && departureTime <= sixHoursFromNow;
+    });
+
+    if (compatibleFlights.length === 0) return null;
+
+    // Sort by closest departure time
+    compatibleFlights.sort((a, b) => 
+      new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime()
+    );
+
+    return compatibleFlights[0];
   }
 
   // Metrics
