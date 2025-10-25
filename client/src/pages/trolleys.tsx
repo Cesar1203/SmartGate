@@ -54,11 +54,19 @@ export default function Trolleys() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: "environment",
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
         setIsCapturing(true);
+        // Ensure video plays
+        await videoRef.current.play();
       }
     } catch (error) {
       toast({
@@ -182,16 +190,23 @@ export default function Trolleys() {
 
             {isCapturing && (
               <div className="space-y-4">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  className="w-full rounded-md bg-black aspect-video"
-                />
+                <div className="relative rounded-md overflow-hidden bg-black">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-auto"
+                    style={{ minHeight: '300px' }}
+                  />
+                  <div className="absolute top-2 right-2 bg-destructive text-destructive-foreground px-2 py-1 rounded text-xs font-medium">
+                    LIVE
+                  </div>
+                </div>
                 <div className="flex gap-2">
                   <Button onClick={captureImage} className="flex-1" data-testid="button-capture-trolley">
                     <Camera className="h-4 w-4 mr-2" />
-                    Capture
+                    Capture Photo
                   </Button>
                   <Button onClick={stopCamera} variant="outline">
                     Cancel
