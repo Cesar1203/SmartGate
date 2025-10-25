@@ -21,6 +21,7 @@ export default function Flights() {
 
   const { data: flights, isLoading } = useQuery<Flight[]>({
     queryKey: ["/api/flights"],
+    refetchInterval: 3000, // Auto-refresh every 3 seconds for real-time updates
   });
 
   const form = useForm<InsertFlight>({

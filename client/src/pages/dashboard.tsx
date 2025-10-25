@@ -7,18 +7,22 @@ import type { DashboardMetrics, TrendData, EmployeeMetric } from "@shared/schema
 export default function Dashboard() {
   const { data: metrics, isLoading } = useQuery<DashboardMetrics>({
     queryKey: ["/api/metrics"],
+    refetchInterval: 3000, // Auto-refresh every 3 seconds for real-time updates
   });
 
   const { data: efficiencyTrend } = useQuery<TrendData[]>({
     queryKey: ["/api/metrics/efficiency-trend"],
+    refetchInterval: 5000, // Auto-refresh every 5 seconds
   });
 
   const { data: foodSavedTrend } = useQuery<TrendData[]>({
     queryKey: ["/api/metrics/food-saved-trend"],
+    refetchInterval: 5000, // Auto-refresh every 5 seconds
   });
 
   const { data: employeeMetrics } = useQuery<EmployeeMetric[]>({
     queryKey: ["/api/metrics/employees"],
+    refetchInterval: 10000, // Auto-refresh every 10 seconds
   });
 
   if (isLoading) {
