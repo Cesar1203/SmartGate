@@ -20,15 +20,17 @@ export function DemoModeToggle() {
 
   const loadDemoMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/demo/load", { method: "POST" });
+      return await apiRequest("POST", "/api/demo/load");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/flights"] });
       queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bottles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trolleys"] });
       queryClient.invalidateQueries({ queryKey: ["/api/metrics"] });
       toast({
         title: "Demo Mode Activated",
-        description: "Sample flights, rules, and metrics have been loaded for demonstration.",
+        description: "Sample flights, rules, bottles, trolleys, and metrics have been loaded.",
       });
       setIsDialogOpen(false);
     },
@@ -43,11 +45,13 @@ export function DemoModeToggle() {
 
   const clearDataMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/demo/clear", { method: "POST" });
+      return await apiRequest("POST", "/api/demo/clear");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/flights"] });
       queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bottles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trolleys"] });
       queryClient.invalidateQueries({ queryKey: ["/api/metrics"] });
       toast({
         title: "Data Cleared",
@@ -83,7 +87,7 @@ export function DemoModeToggle() {
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Load Demo Data</h4>
             <p className="text-sm text-muted-foreground">
-              Loads sample flights with varying reliability scores (85%, 60%, 45%), airline rules, and employee metrics.
+              Loads sample flights with varying reliability scores (85%, 60%, 45%), airline rules, bottle analyses, trolley verifications, and employee metrics.
             </p>
             <Button
               onClick={() => loadDemoMutation.mutate()}
