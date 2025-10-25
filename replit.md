@@ -83,7 +83,46 @@ Preferred communication style: Simple, everyday language.
 - Airline Rules: Per-airline configuration for bottle handling thresholds
 - Bottle Analyses: Historical record of bottle inspections with AI recommendations
 - Trolley Verifications: Audit trail of trolley checks with error detection results
+- Reassignments: Complete audit trail of food/bottle reassignments with airline restrictions
 - Dashboard Metrics: Aggregated analytics for operational performance
+
+### Automatic Reassignment System
+
+**GateGroup Pick & Pack Integration**
+- Follows real-world airline segregation protocols: food can ONLY be reassigned within same airline
+- Aligned with Smart Execution track requirements for HackMTY 2025
+- Prevents cross-airline contamination of fresh food inventory
+
+**Reassignment Rules**
+1. **Airline Restriction**: Food from delayed/cancelled flights can only go to flights of the same airline
+   - Airline code extracted from flight number (e.g., AM245 → AM, AA789 → AA)
+   - Prevents scenarios like AeroMexico food going to Delta flights
+2. **Time Window**: Target flights must depart within 6 hours of original flight
+3. **Priority**: Closest departure time gets priority for reassignment
+4. **Status Tracking**:
+   - `success`: Same-airline flight found and food reassigned
+   - `pending`: Awaiting manual confirmation
+   - `no_flight`: No compatible same-airline flight available (food expires)
+
+**API Endpoints**
+- `GET /api/reassignments` - Returns complete reassignment history with audit trail
+- `POST /api/reassignments/process` - Batch processes all delayed/cancelled flights
+
+**UI Features**
+- Real-time reassignment processing via "Procesar Reasignaciones" button
+- Color-coded status indicators:
+  - 🟢 Green (Exitoso): Successfully reassigned to same airline
+  - 🟡 Yellow (Pendiente): Awaiting confirmation
+  - 🔴 Red (Sin Vuelo): No compatible flight, food will expire
+- Visible airline codes and flight numbers in logs for transparency
+- Rules documentation section explaining same-airline constraint
+
+**Demo Data**
+- Multiple flights per airline enable realistic testing:
+  - AeroMexico: AM651, AM245 (delayed), AM892
+  - American Airlines: AA789 (delayed), AA456
+  - Delta: DL456, DL321 (cancelled, no compatible flight)
+- Demonstrates successful same-airline reassignments and "no flight" edge cases
 
 ### External Dependencies
 
