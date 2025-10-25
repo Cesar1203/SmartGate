@@ -14,6 +14,30 @@ export const demoFlights: Omit<Flight, "id">[] = [
     actualBottles: null,
   },
   {
+    flightNumber: "AM245",
+    departureTime: new Date(Date.now() + 3 * 60 * 60 * 1000), // 3 hours from now
+    destination: "Mexico City (MEX)",
+    airline: "AeroMexico",
+    status: "delayed",
+    plannedMeals: 160,
+    plannedBottles: 80,
+    reliability: 50,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "AM892",
+    departureTime: new Date(Date.now() + 5 * 60 * 60 * 1000), // 5 hours from now
+    destination: "Guadalajara (GDL)",
+    airline: "AeroMexico",
+    status: "scheduled",
+    plannedMeals: 140,
+    plannedBottles: 70,
+    reliability: 88,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
     flightNumber: "UA1234",
     departureTime: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 hours from now
     destination: "Los Angeles (LAX)",
@@ -27,13 +51,25 @@ export const demoFlights: Omit<Flight, "id">[] = [
   },
   {
     flightNumber: "AA789",
-    departureTime: new Date(Date.now() + 6 * 60 * 60 * 1000), // 6 hours from now
+    departureTime: new Date(Date.now() + 1.5 * 60 * 60 * 1000), // 1.5 hours from now
     destination: "Miami (MIA)",
     airline: "American Airlines",
     status: "delayed",
     plannedMeals: 150,
     plannedBottles: 75,
     reliability: 45,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "AA456",
+    departureTime: new Date(Date.now() + 3.5 * 60 * 60 * 1000), // 3.5 hours from now
+    destination: "Dallas (DFW)",
+    airline: "American Airlines",
+    status: "scheduled",
+    plannedMeals: 190,
+    plannedBottles: 95,
+    reliability: 78,
     actualMeals: null,
     actualBottles: null,
   },
@@ -46,6 +82,18 @@ export const demoFlights: Omit<Flight, "id">[] = [
     plannedMeals: 200,
     plannedBottles: 100,
     reliability: 92,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "DL321",
+    departureTime: new Date(Date.now() + 2.5 * 60 * 60 * 1000), // 2.5 hours from now
+    destination: "Detroit (DTW)",
+    airline: "Delta",
+    status: "cancelled",
+    plannedMeals: 170,
+    plannedBottles: 85,
+    reliability: 30,
     actualMeals: null,
     actualBottles: null,
   },
