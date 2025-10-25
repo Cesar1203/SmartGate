@@ -1,13 +1,40 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plane, TrendingUp, Users, PackageCheck, Wine, AlertTriangle, Clock, Target, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Plane, TrendingUp, Users, PackageCheck, Wine, AlertTriangle, Clock, Target, CheckCircle2, RefreshCw } from "lucide-react";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import type { DashboardMetrics, TrendData, EmployeeMetric } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Dashboard() {
+  const { toast } = useToast();
+  
   const { data: metrics, isLoading } = useQuery<DashboardMetrics>({
     queryKey: ["/api/metrics"],
     refetchInterval: 3000, // Auto-refresh every 3 seconds for real-time updates
+  });
+
+  const reloadDemoDataMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/demo/load");
+      return res;
+    },
+    onSuccess: () => {
+      // Invalidate all queries to refresh all data
+      queryClient.invalidateQueries();
+      toast({
+        title: "Demo data reloaded",
+        description: "All demo data has been successfully reloaded",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to reload demo data",
+        variant: "destructive",
+      });
+    },
   });
 
   const { data: efficiencyTrend } = useQuery<TrendData[]>({
@@ -44,9 +71,21 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Operations Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Real-time metrics and performance analytics</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Operations Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Real-time metrics and performance analytics</p>
+        </div>
+        <Button
+          onClick={() => reloadDemoDataMutation.mutate()}
+          disabled={reloadDemoDataMutation.isPending}
+          variant="outline"
+          className="gap-2"
+          data-testid="button-reload-demo"
+        >
+          <RefreshCw className={`h-4 w-4 ${reloadDemoDataMutation.isPending ? 'animate-spin' : ''}`} />
+          {reloadDemoDataMutation.isPending ? "Loading..." : "Reload Demo Data"}
+        </Button>
       </div>
 
       {/* Key Metrics Grid */}
