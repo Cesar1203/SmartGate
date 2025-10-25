@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plane, Wine, ClipboardCheck, Settings, Calendar } from "lucide-react";
+import { LayoutDashboard, Plane, Wine, ClipboardCheck, Settings, Calendar, ShoppingCart } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
   Sidebar,
@@ -23,6 +23,11 @@ const menuItems = [
     title: "Flight Management",
     url: "/flights",
     icon: Plane,
+  },
+  {
+    title: "Customer Orders",
+    url: "/orders",
+    icon: ShoppingCart,
   },
   {
     title: "Bottle Handling",
