@@ -1,0 +1,125 @@
+Quiero que desarrolles un prototipo de software llamado SmartCater, diseñado para la empresa GateGroup (encargada de la preparación y logística de alimentos para aerolíneas).
+
+El objetivo es optimizar la ejecución inteligente (Smart Execution) en sus operaciones de catering aéreo, enfocándose en:
+
+Manejo automático de botellas de alcohol (Alcohol Bottle Handling)
+
+Detección de errores en tiempo real (Real-Time Error Detection)
+
+Eficiencia del personal (Employee Efficiency)
+
+Predicción de cancelaciones por clima (Flight Reliability Predictor)
+
+🧩 Estructura general del sistema
+
+Desarrolla un sistema web modular con las siguientes secciones:
+
+1. Módulo de Gestión de Vuelos
+
+Base de datos de vuelos con: número, hora de salida, destino, aerolínea, estatus (programado, retrasado, cancelado), y carga planificada (comidas, botellas, etc.).
+
+Conexión a una API de clima (como OpenWeatherMap o WeatherAPI).
+
+El sistema toma los datos del clima según la hora y aeropuerto, y calcula una probabilidad de cancelación o retraso, usando:
+
+Historial de cancelaciones por condiciones similares.
+
+Factores meteorológicos: lluvia, viento, tormentas eléctricas, visibilidad.
+
+Devuelve un porcentaje de confiabilidad del vuelo (Flight Reliability %).
+
+Si la confiabilidad es menor al 70%, el sistema sugiere reducir la carga de alimentos frescos (por ejemplo, -30%).
+
+2. Módulo de Manejo de Botellas
+
+Permite al empleado tomar una foto con la cámara del dispositivo.
+
+Usa visión por computadora (modelo YOLOv8 o similar) para detectar:
+
+Tipo de botella.
+
+Nivel de llenado aproximado.
+
+Aplica reglas personalizadas por aerolínea (configurables desde el panel de administrador), por ejemplo:
+
+“>70% → Reusar”
+
+“40–70% → Combinar”
+
+“<40% → Descartar”
+
+Muestra la acción sugerida en pantalla y registra el resultado.
+
+3. Módulo de Detección de Errores (Trolleys)
+
+Permite tomar una foto del trolley armado.
+
+Compara la imagen con un “golden layout” predefinido (estructura correcta).
+
+Marca con recuadros rojos los ítems faltantes o incorrectos.
+
+Envía una notificación inmediata si hay discrepancias.
+
+4. Módulo de Replanificación Automática
+
+Cuando un vuelo cambia de horario, el sistema reasigna automáticamente:
+
+Alimentos frescos próximos a caducar a otro vuelo compatible.
+
+Tareas de empleados (quién prepara qué).
+
+Los empleados ven las actualizaciones en tiempo real.
+
+5. Panel de Control
+
+Dashboard con métricas clave:
+
+Eficiencia del personal (% de tareas completadas sin errores).
+
+Porcentaje de confiabilidad de cada vuelo (basado en clima).
+
+Alimentos salvados (evitando desperdicio).
+
+Botellas reusadas o descartadas.
+
+Todo en tiempo real con gráficas dinámicas (ej. Recharts o Chart.js).
+
+⚙️ Tecnologías sugeridas
+
+Frontend: React o Next.js
+
+Backend: Python (FastAPI) o Node.js (Express)
+
+Base de datos: PostgreSQL o Firebase
+
+Visión por computadora: YOLOv8, OpenCV, TensorFlow Lite
+
+Clima / Vuelos API: OpenWeatherMap + FlightAware o AviationStack
+
+IA ligera: modelo de regresión o árbol de decisión para calcular probabilidad de cancelación
+
+Notificaciones en tiempo real: WebSocket o Firebase Cloud Messaging
+
+💡 Ejemplo de uso
+
+El vuelo AMX245 tiene una confiabilidad del 55% por mal clima → el sistema sugiere preparar solo el 60% de la comida.
+
+El trolley del vuelo muestra error visual (falta un vino) → alerta en rojo.
+
+La botella de whisky detectada con 45% → acción: combinar.
+
+El vuelo LH234 se retrasa 6h → las bandejas frescas se reasignan automáticamente a otro vuelo cercano.
+
+🧠 Extras opcionales
+
+Chat interno entre empleados y supervisores.
+
+Historial de decisiones automáticas (log).
+
+Exportación de reportes PDF diarios.
+
+Panel administrativo multiaerolínea.
+
+Tu tarea: Genera el diseño de la arquitectura completa del sistema (backend, frontend, modelos IA), con ejemplos de código y flujos de datos.
+Prioriza eficiencia, escalabilidad y adaptabilidad.
+Recuerda: este sistema debe funcionar sin hardware adicional y puede ejecutarse en tablets o laptops existentes de GateGroup.
