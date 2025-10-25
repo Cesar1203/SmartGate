@@ -7,6 +7,8 @@ import {
   type InsertBottleAnalysis,
   type TrolleyVerification,
   type InsertTrolleyVerification,
+  type Order,
+  type InsertOrder,
   type DashboardMetrics,
   type TrendData,
   type EmployeeMetric,
@@ -35,6 +37,14 @@ export interface IStorage {
   getTrolleyVerifications(): Promise<TrolleyVerification[]>;
   createTrolleyVerification(verification: InsertTrolleyVerification): Promise<TrolleyVerification>;
 
+  // Order operations
+  getOrders(): Promise<Order[]>;
+  getPendingOrders(): Promise<Order[]>;
+  getOrder(id: string): Promise<Order | undefined>;
+  createOrder(order: InsertOrder): Promise<Order>;
+  updateOrderStatus(id: string, status: string): Promise<Order | undefined>;
+  deleteOrder(id: string): Promise<boolean>;
+
   // Metrics
   getDashboardMetrics(): Promise<DashboardMetrics>;
   getEfficiencyTrend(): Promise<TrendData[]>;
@@ -51,12 +61,14 @@ export class MemStorage implements IStorage {
   private airlineRules: Map<string, AirlineRule>;
   private bottleAnalyses: BottleAnalysis[];
   private trolleyVerifications: TrolleyVerification[];
+  private orders: Map<string, Order>;
 
   constructor() {
     this.flights = new Map();
     this.airlineRules = new Map();
     this.bottleAnalyses = [];
     this.trolleyVerifications = [];
+    this.orders = new Map();
   }
 
   // Flight operations
@@ -178,6 +190,54 @@ export class MemStorage implements IStorage {
     return verification;
   }
 
+  // Order operations
+  async getOrders(): Promise<Order[]> {
+    return Array.from(this.orders.values()).sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+  }
+
+  async getPendingOrders(): Promise<Order[]> {
+    return Array.from(this.orders.values())
+      .filter((order) => order.status === "pending" || order.status === "in_verification")
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }
+
+  async getOrder(id: string): Promise<Order | undefined> {
+    return this.orders.get(id);
+  }
+
+  async createOrder(insertOrder: InsertOrder): Promise<Order> {
+    const id = randomUUID();
+    const order: Order = {
+      id,
+      flightNumber: insertOrder.flightNumber,
+      airline: insertOrder.airline,
+      departureTime: insertOrder.departureTime,
+      destination: insertOrder.destination,
+      mealsRequested: insertOrder.mealsRequested || 0,
+      snacksRequested: insertOrder.snacksRequested || 0,
+      beveragesRequested: insertOrder.beveragesRequested || 0,
+      status: (insertOrder.status as any) || "pending",
+      timestamp: new Date(),
+    };
+    this.orders.set(id, order);
+    return order;
+  }
+
+  async updateOrderStatus(id: string, status: string): Promise<Order | undefined> {
+    const order = this.orders.get(id);
+    if (!order) return undefined;
+
+    const updated = { ...order, status: status as any };
+    this.orders.set(id, updated);
+    return updated;
+  }
+
+  async deleteOrder(id: string): Promise<boolean> {
+    return this.orders.delete(id);
+  }
+
   // Metrics
   async getDashboardMetrics(): Promise<DashboardMetrics> {
     const flights = await this.getFlights();
@@ -286,6 +346,7 @@ export class MemStorage implements IStorage {
     this.airlineRules.clear();
     this.bottleAnalyses = [];
     this.trolleyVerifications = [];
+    this.orders.clear();
   }
 }
 

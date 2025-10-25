@@ -1,0 +1,61 @@
+Por favor, agrega al módulo de cliente de SmartCater la funcionalidad de pedidos pendientes con flujo de completado y verificación de trolley, con estas características:
+
+🔹 Funcionalidad principal
+
+Listado de pedidos pendientes
+
+Mostrar todos los pedidos creados por clientes en una tabla o lista lateral.
+
+Cada pedido debe mostrar: vuelo, aerolínea, hora, productos solicitados, y estado (“Pendiente”, “En Proceso”, etc.).
+
+Botón “Completar pedido”
+
+Al presionarlo, el pedido pasa a estado “En verificación”.
+
+Solo en ese momento, aparece un modal o pantalla para verificación del trolley (simulada o real).
+
+Mientras tanto, la opción de verificación no debe aparecer en la lista lateral para otros pedidos.
+
+Verificación del trolley
+
+Modal o sección donde se pueda simular o confirmar que el trolley está correcto.
+
+Botones: “Verificado ✅” y “Cancelar ❌”.
+
+Una vez verificado, el pedido pasa a estado “Completado”.
+
+El pedido desaparece de la lista lateral de pendientes.
+
+Comportamiento condicional
+
+La verificación solo se activa si se presiona “Completar pedido”.
+
+Mientras el pedido no esté en “En verificación”, no mostrar la opción de verificar trolley.
+
+La lista lateral debe actualizarse dinámicamente cuando se completa un pedido o se verifica.
+
+⚙️ Tecnologías sugeridas
+
+Frontend: React / Next.js + TailwindCSS.
+
+Backend: FastAPI o Node.js (Express) con endpoints para:
+
+GET /orders/pending → lista de pedidos pendientes
+
+POST /orders/:id/complete → marca pedido como “En verificación”
+
+POST /orders/:id/verify → marca pedido como “Completado”
+
+Estado local o Redux para manejar dinámicamente la lista de pedidos y modal de verificación.
+
+UI: modal o drawer para trolley verification, que solo aparece al presionar “Completar pedido”.
+
+💡 Extras opcionales
+
+Toasts de confirmación: “Pedido completado”, “Trolley verificado”.
+
+Indicadores visuales en la lista lateral de estado del pedido (Pendiente → En verificación → Completado).
+
+Simulación de verificación de trolley con foto o checkbox.
+
+Objetivo: Crear un flujo seguro y controlado donde los pedidos solo pueden ser verificados después de presionar “Completar”, y la lista lateral siempre muestra los pedidos pendientes actuales sin duplicar la verificación.

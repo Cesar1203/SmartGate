@@ -157,3 +157,37 @@ export interface FlightReliabilityResult {
   weather: WeatherData;
   recommendation: string;
 }
+
+// Order statuses for customer orders workflow
+export const OrderStatus = {
+  PENDING: "pending",
+  IN_VERIFICATION: "in_verification",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+
+// Customer orders table
+export const orders = pgTable("orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  flightNumber: text("flight_number").notNull(),
+  airline: text("airline").notNull(),
+  departureTime: timestamp("departure_time").notNull(),
+  destination: text("destination").notNull(),
+  mealsRequested: integer("meals_requested").notNull().default(0),
+  snacksRequested: integer("snacks_requested").notNull().default(0),
+  beveragesRequested: integer("beverages_requested").notNull().default(0),
+  status: text("status").notNull().$type<OrderStatus>().default("pending"),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const insertOrderSchema = createInsertSchema(orders).omit({
+  id: true,
+  timestamp: true,
+}).extend({
+  departureTime: z.coerce.date(),
+});
+
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type Order = typeof orders.$inferSelect;

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertFlightSchema, insertAirlineRuleSchema } from "@shared/schema";
+import { insertFlightSchema, insertAirlineRuleSchema, insertOrderSchema } from "@shared/schema";
 import { analyzeBottleImage, verifyTrolleyImage } from "./openai";
 import { getWeatherData, calculateFlightReliability, getReliabilityRecommendation } from "./weather";
 
@@ -243,6 +243,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(employees);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch employee metrics" });
+    }
+  });
+
+  // Customer orders routes
+  app.get("/api/orders", async (_req, res) => {
+    try {
+      const orders = await storage.getOrders();
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  app.get("/api/orders/pending", async (_req, res) => {
+    try {
+      const orders = await storage.getPendingOrders();
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch pending orders" });
+    }
+  });
+
+  app.post("/api/orders", async (req, res) => {
+    try {
+      const validated = insertOrderSchema.parse(req.body);
+      const order = await storage.createOrder(validated);
+      res.status(201).json(order);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Invalid order data" });
+    }
+  });
+
+  app.post("/api/orders/:id/complete", async (req, res) => {
+    try {
+      const order = await storage.getOrder(req.params.id);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      if (order.status !== "pending") {
+        return res.status(400).json({ error: "Order must be pending to complete" });
+      }
+
+      const updated = await storage.updateOrderStatus(req.params.id, "in_verification");
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to complete order" });
+    }
+  });
+
+  app.post("/api/orders/:id/verify", async (req, res) => {
+    try {
+      const order = await storage.getOrder(req.params.id);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      if (order.status !== "in_verification") {
+        return res.status(400).json({ error: "Order must be in verification to verify" });
+      }
+
+      const updated = await storage.updateOrderStatus(req.params.id, "completed");
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to verify order" });
+    }
+  });
+
+  app.post("/api/orders/:id/cancel", async (req, res) => {
+    try {
+      const order = await storage.getOrder(req.params.id);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      const updated = await storage.updateOrderStatus(req.params.id, "cancelled");
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to cancel order" });
+    }
+  });
+
+  app.delete("/api/orders/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteOrder(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete order" });
     }
   });
 
