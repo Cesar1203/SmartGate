@@ -1,4 +1,4 @@
-import type { Flight, AirlineRule, EmployeeMetric, BottleAnalysis, TrolleyVerification } from "./schema";
+import type { Flight, AirlineRule, EmployeeMetric, BottleAnalysis, TrolleyVerification, TrendData } from "./schema";
 
 export const demoFlights: Omit<Flight, "id">[] = [
   {
@@ -162,4 +162,25 @@ export const demoTrolleyVerifications: Omit<TrolleyVerification, "id" | "timesta
     errors: [],
     aiAnalysis: "Perfect match with golden layout. No errors detected.",
   },
+];
+
+// Fixed trend data for consistent demo mode
+export const demoEfficiencyTrend: TrendData[] = [
+  { date: "Oct 19", value: 94.2 },
+  { date: "Oct 20", value: 95.8 },
+  { date: "Oct 21", value: 96.3 },
+  { date: "Oct 22", value: 97.1 },
+  { date: "Oct 23", value: 96.9 },
+  { date: "Oct 24", value: 97.5 },
+  { date: "Oct 25", value: 98.2 },
+];
+
+export const demoFoodSavedTrend: TrendData[] = [
+  { date: "Oct 19", value: 42 },
+  { date: "Oct 20", value: 38 },
+  { date: "Oct 21", value: 51 },
+  { date: "Oct 22", value: 45 },
+  { date: "Oct 23", value: 48 },
+  { date: "Oct 24", value: 53 },
+  { date: "Oct 25", value: 47 },
 ];

@@ -197,49 +197,15 @@ export class MemStorage implements IStorage {
   }
 
   async getEfficiencyTrend(): Promise<TrendData[]> {
-    // Generate mock trend data for the last 7 days
-    const today = new Date();
-    const trend: TrendData[] = [];
-
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-
-      // Simulate increasing efficiency trend
-      const baseEfficiency = 85;
-      const variance = Math.random() * 10;
-      const value = Math.min(100, baseEfficiency + variance + i);
-
-      trend.push({
-        date: dateStr,
-        value: Math.round(value * 10) / 10,
-      });
-    }
-
-    return trend;
+    // Return fixed demo trend data for consistent demo mode
+    const { demoEfficiencyTrend } = await import("@shared/demo-data");
+    return demoEfficiencyTrend;
   }
 
   async getFoodSavedTrend(): Promise<TrendData[]> {
-    // Generate mock trend data for the last 7 days
-    const today = new Date();
-    const trend: TrendData[] = [];
-
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-
-      // Simulate food saved data
-      const value = Math.floor(Math.random() * 50) + 20;
-
-      trend.push({
-        date: dateStr,
-        value,
-      });
-    }
-
-    return trend;
+    // Return fixed demo trend data for consistent demo mode
+    const { demoFoodSavedTrend } = await import("@shared/demo-data");
+    return demoFoodSavedTrend;
   }
 
   async getEmployeeMetrics(): Promise<EmployeeMetric[]> {
