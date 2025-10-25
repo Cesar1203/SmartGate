@@ -1,0 +1,107 @@
+The current SmartCater app works well, but I want to perfect and finalize it for a hackathon demo (Hack MTY 2025, GateGroup - Smart Execution track).
+
+Please refactor and polish the system with the following improvements and adjustments:
+
+🔧 1. Core Fixes
+
+Fix the temporary “development message” so it never appears in production.
+
+Make sure flight departure times work properly with date & time pickers (correct timezone handling).
+
+Validate all input fields before saving (e.g., flight number, time, weather data, etc.).
+
+Add a toast or modal confirmation when a flight is successfully saved or updated.
+
+🌦️ 2. Weather & Flight Reliability
+
+Ensure the app automatically fetches real weather data (temperature, wind, visibility, etc.) from OpenWeatherMap API or WeatherAPI based on the airport code and flight time.
+
+Add a simple machine learning logic or probabilistic formula to estimate flight reliability:
+
+reliability = 100 
+              - (rain_probability * 0.5) 
+              - (wind_speed * 2) 
+              - (storm_risk * 30)
+
+
+If reliability < 70%, show a warning icon and a suggestion like:
+“⚠️ High weather risk — reduce fresh food load by 30%.”
+
+Display a “Flight Reliability %” meter in the dashboard.
+
+🥃 3. Alcohol Bottle Handling
+
+Add a form where admins can define airline rules for bottle usage (e.g., thresholds for reuse/combining/discard).
+
+Add a demo image upload field where a user can upload a photo of a bottle and the system uses a simulated AI call to classify the fill level (for now, random mock or simulated value).
+
+Based on the rules, show the recommended action dynamically (“Reuse”, “Combine”, “Discard”).
+
+🧺 4. Trolley Error Detection (Simulation)
+
+Add a “Trolley Check” section where users can upload a trolley image (placeholder for AI detection).
+
+Simulate a “Golden Layout” comparison and randomly generate feedback like:
+
+“Missing 1 drink item.”
+
+“Incorrect snack detected.”
+
+“All items correct ✅.”
+
+Display results visually on the dashboard (pie chart of trolley accuracy rate).
+
+👨‍💼 5. Employee Efficiency Dashboard
+
+Add a simple employee activity tracker (e.g., time per trolley, accuracy %, errors detected).
+
+Show these metrics on the main dashboard with small cards:
+
+Avg. prep time per trolley
+
+Error detection rate
+
+Rule compliance %
+
+⚙️ 6. UX / UI Polish
+
+Create a clean, modern interface (use TailwindCSS).
+
+Add icons and colors that match GateGroup’s visual identity (orange/gray/white tones).
+
+Make sure all pages are responsive and mobile-friendly (tablets & phones).
+
+Add a header with the app logo “SmartCater” and a tagline:
+“Intelligent Catering Execution for GateGroup.”
+
+💾 7. Backend Logic (if simulated)
+
+Use mock data for AI predictions, but structure the code so it’s easy to connect to real APIs later.
+
+Keep all flight, weather, and rules data persistent (e.g., local JSON file, Firebase, or SQLite).
+
+Add an API route for GET /reliability/:flightNumber that returns reliability and suggestion.
+
+🎤 8. Presentation Mode
+
+Add a toggle or button “Demo Mode” that preloads example data:
+
+Flights with different reliability scores (85%, 60%, 45%).
+
+A few bottle samples with different fill levels.
+
+Employee performance summary.
+
+In Demo Mode, everything should run smoothly offline without needing real API keys.
+
+🧩 Goal
+
+Final result should be a fully functional and visually polished demo that:
+
+Looks professional enough to present to judges.
+
+Demonstrates automation, decision-making, and weather-based logic.
+
+Runs fully in the browser or with minimal backend setup.
+
+⚠️ Focus on clarity, user flow, and smart automation, not just visuals.
