@@ -158,6 +158,37 @@ export interface FlightReliabilityResult {
   recommendation: string;
 }
 
+// Reassignment statuses
+export const ReassignmentStatus = {
+  SUCCESS: "success",
+  PENDING: "pending",
+  NO_FLIGHT: "no_flight",
+} as const;
+
+export type ReassignmentStatus = typeof ReassignmentStatus[keyof typeof ReassignmentStatus];
+
+// Reassignment logs table
+export const reassignments = pgTable("reassignments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fromFlightNumber: text("from_flight_number").notNull(),
+  toFlightNumber: text("to_flight_number"),
+  airline: text("airline").notNull(),
+  airlineCode: text("airline_code").notNull(),
+  mealsReassigned: integer("meals_reassigned").notNull().default(0),
+  bottlesReassigned: integer("bottles_reassigned").notNull().default(0),
+  status: text("status").notNull().$type<ReassignmentStatus>(),
+  reason: text("reason"),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const insertReassignmentSchema = createInsertSchema(reassignments).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertReassignment = z.infer<typeof insertReassignmentSchema>;
+export type Reassignment = typeof reassignments.$inferSelect;
+
 // Order statuses for customer orders workflow
 export const OrderStatus = {
   PENDING: "pending",
