@@ -18,6 +18,73 @@ export interface TrolleyVerificationResult {
   analysis: string;
 }
 
+// Simulated analysis for demo mode when OpenAI quota is exceeded
+function generateSimulatedBottleAnalysis(
+  reuseThreshold: number,
+  combineThreshold: number
+): BottleAnalysisResult {
+  const bottleTypes = ["Wine - Red", "Wine - White", "Champagne", "Vodka", "Whiskey", "Gin", "Rum"];
+  const bottleType = bottleTypes[Math.floor(Math.random() * bottleTypes.length)];
+  
+  // Generate realistic fill levels
+  const fillLevel = Math.floor(Math.random() * 95) + 5; // 5-100%
+  
+  let recommendedAction: "reuse" | "combine" | "discard";
+  let analysis: string;
+  
+  if (fillLevel >= reuseThreshold) {
+    recommendedAction = "reuse";
+    analysis = `Bottle is ${fillLevel}% full. Excellent condition for reuse on next flight. [Simulated Analysis]`;
+  } else if (fillLevel >= combineThreshold) {
+    recommendedAction = "combine";
+    analysis = `Bottle is ${fillLevel}% full. Recommended to combine with similar bottles to minimize waste. [Simulated Analysis]`;
+  } else {
+    recommendedAction = "discard";
+    analysis = `Bottle is only ${fillLevel}% full. Below threshold for reuse or combination. [Simulated Analysis]`;
+  }
+  
+  return {
+    bottleType,
+    fillLevel,
+    recommendedAction,
+    analysis,
+  };
+}
+
+// Simulated trolley verification for demo mode
+function generateSimulatedTrolleyVerification(): TrolleyVerificationResult {
+  const hasErrors = Math.random() > 0.6; // 40% chance of errors
+  
+  const possibleErrors = [
+    "Missing beverage item in section B",
+    "Incorrect snack placement detected",
+    "Meal container not aligned properly",
+    "Missing cutlery set in row 3",
+    "Wrong beverage type in compartment A2",
+  ];
+  
+  const errors: string[] = [];
+  if (hasErrors) {
+    const numErrors = Math.floor(Math.random() * 2) + 1; // 1-2 errors
+    for (let i = 0; i < numErrors; i++) {
+      const error = possibleErrors[Math.floor(Math.random() * possibleErrors.length)];
+      if (!errors.includes(error)) {
+        errors.push(error);
+      }
+    }
+  }
+  
+  const analysis = hasErrors
+    ? `Trolley verification identified ${errors.length} discrepanc${errors.length === 1 ? 'y' : 'ies'}. Please review and correct before service. [Simulated Analysis]`
+    : "All items correctly positioned. Trolley matches standard layout perfectly. [Simulated Analysis]";
+  
+  return {
+    hasErrors: errors.length > 0,
+    errors,
+    analysis,
+  };
+}
+
 export async function analyzeBottleImage(
   base64Image: string,
   reuseThreshold: number,
@@ -76,6 +143,13 @@ Respond with JSON in this exact format:
     };
   } catch (error) {
     console.error("Bottle analysis error:", error);
+    
+    // If quota exceeded or API unavailable, use simulated analysis for demo
+    if (error instanceof Error && (error.message.includes('quota') || error.message.includes('429'))) {
+      console.log("OpenAI quota exceeded - using simulated analysis for demo");
+      return generateSimulatedBottleAnalysis(reuseThreshold, combineThreshold);
+    }
+    
     throw new Error("Failed to analyze bottle image");
   }
 }
@@ -131,6 +205,13 @@ If everything looks correct, set hasErrors to false and errors to an empty array
     };
   } catch (error) {
     console.error("Trolley verification error:", error);
+    
+    // If quota exceeded or API unavailable, use simulated verification for demo
+    if (error instanceof Error && (error.message.includes('quota') || error.message.includes('429'))) {
+      console.log("OpenAI quota exceeded - using simulated verification for demo");
+      return generateSimulatedTrolleyVerification();
+    }
+    
     throw new Error("Failed to verify trolley image");
   }
 }
