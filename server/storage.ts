@@ -437,6 +437,7 @@ export class MemStorage implements IStorage {
     this.bottleAnalyses = [];
     this.trolleyVerifications = [];
     this.orders.clear();
+    this.reassignments = [];
   }
 }
 

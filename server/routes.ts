@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertFlightSchema, insertAirlineRuleSchema, insertOrderSchema } from "@shared/schema";
+import { storage, extractAirlineCode } from "./storage";
+import { insertFlightSchema, insertAirlineRuleSchema, insertOrderSchema, insertReassignmentSchema } from "@shared/schema";
 import { analyzeBottleImage, verifyTrolleyImage } from "./openai";
 import { getWeatherData, calculateFlightReliability, getReliabilityRecommendation } from "./weather";
 
@@ -334,6 +334,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete order" });
+    }
+  });
+
+  // Reassignment routes
+  app.get("/api/reassignments", async (_req, res) => {
+    try {
+      const reassignments = await storage.getReassignments();
+      res.json(reassignments);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reassignments" });
+    }
+  });
+
+  app.post("/api/reassignments/process", async (_req, res) => {
+    try {
+      const flights = await storage.getFlights();
+      const delayedFlights = flights.filter((f) => f.status === "delayed" || f.status === "cancelled");
+      const reassignments = [];
+
+      for (const delayedFlight of delayedFlights) {
+        const compatibleFlight = await storage.findCompatibleFlight(delayedFlight, flights);
+        const airlineCode = extractAirlineCode(delayedFlight.flightNumber, delayedFlight.airline);
+
+        if (compatibleFlight) {
+          const reassignment = await storage.createReassignment({
+            fromFlightNumber: delayedFlight.flightNumber,
+            toFlightNumber: compatibleFlight.flightNumber,
+            airline: delayedFlight.airline,
+            airlineCode,
+            mealsReassigned: delayedFlight.plannedMeals || 0,
+            bottlesReassigned: delayedFlight.plannedBottles || 0,
+            status: "success",
+            reason: `Reassigned from ${delayedFlight.status} flight ${delayedFlight.flightNumber} to ${compatibleFlight.flightNumber} (same airline)`,
+          });
+          reassignments.push(reassignment);
+        } else {
+          const reassignment = await storage.createReassignment({
+            fromFlightNumber: delayedFlight.flightNumber,
+            toFlightNumber: null,
+            airline: delayedFlight.airline,
+            airlineCode,
+            mealsReassigned: 0,
+            bottlesReassigned: 0,
+            status: "no_flight",
+            reason: `No same-airline flight available within 6 hours; mark as expiring`,
+          });
+          reassignments.push(reassignment);
+        }
+      }
+
+      res.json({ reassignments, processed: delayedFlights.length });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to process reassignments" });
     }
   });
 
