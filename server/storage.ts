@@ -9,6 +9,7 @@ import {
   type InsertTrolleyVerification,
   type DashboardMetrics,
   type TrendData,
+  type EmployeeMetric,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -38,6 +39,11 @@ export interface IStorage {
   getDashboardMetrics(): Promise<DashboardMetrics>;
   getEfficiencyTrend(): Promise<TrendData[]>;
   getFoodSavedTrend(): Promise<TrendData[]>;
+  getEmployeeMetrics(): Promise<EmployeeMetric[]>;
+
+  // Demo mode
+  loadDemoData(): Promise<void>;
+  clearAllData(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -234,6 +240,65 @@ export class MemStorage implements IStorage {
     }
 
     return trend;
+  }
+
+  async getEmployeeMetrics(): Promise<EmployeeMetric[]> {
+    // Return demo employee metrics
+    const { demoEmployeeMetrics } = await import("@shared/demo-data");
+    return demoEmployeeMetrics;
+  }
+
+  async loadDemoData(): Promise<void> {
+    // Clear existing data
+    await this.clearAllData();
+
+    // Load demo data
+    const { demoFlights, demoRules, demoBottleAnalyses, demoTrolleyVerifications } = await import("@shared/demo-data");
+
+    // Add demo flights and collect IDs
+    const flightIds: string[] = [];
+    for (const flight of demoFlights) {
+      const id = randomUUID();
+      this.flights.set(id, { ...flight, id } as Flight);
+      flightIds.push(id);
+    }
+
+    // Add demo rules
+    for (const rule of demoRules) {
+      const id = randomUUID();
+      this.airlineRules.set(id, { ...rule, id });
+    }
+
+    // Add demo bottle analyses linked to flights
+    for (let i = 0; i < demoBottleAnalyses.length; i++) {
+      const analysis = demoBottleAnalyses[i];
+      const flightId = flightIds[i % flightIds.length]; // Distribute across flights
+      this.bottleAnalyses.push({
+        ...analysis,
+        id: randomUUID(),
+        flightId,
+        timestamp: new Date(),
+      });
+    }
+
+    // Add demo trolley verifications linked to flights
+    for (let i = 0; i < demoTrolleyVerifications.length; i++) {
+      const verification = demoTrolleyVerifications[i];
+      const flightId = flightIds[i % flightIds.length]; // Distribute across flights
+      this.trolleyVerifications.push({
+        ...verification,
+        id: randomUUID(),
+        flightId,
+        timestamp: new Date(),
+      });
+    }
+  }
+
+  async clearAllData(): Promise<void> {
+    this.flights.clear();
+    this.airlineRules.clear();
+    this.bottleAnalyses = [];
+    this.trolleyVerifications = [];
   }
 }
 

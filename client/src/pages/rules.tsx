@@ -34,13 +34,13 @@ export default function Rules() {
     mutationFn: async (data: InsertAirlineRule) => {
       return await apiRequest("POST", "/api/rules", data);
     },
-    onSuccess: () => {
+    onSuccess: (rule: AirlineRule) => {
       queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
       setIsDialogOpen(false);
       form.reset();
       toast({
-        title: "Rule created",
-        description: "Airline rule has been configured successfully.",
+        title: "Airline Rule Created",
+        description: `${rule.airline} bottle handling rules configured: Reuse ≥${rule.reuseThreshold}%, Combine ${rule.combineThreshold}-${rule.reuseThreshold}%`,
       });
     },
     onError: (error: Error) => {
@@ -56,11 +56,11 @@ export default function Rules() {
     mutationFn: async ({ id, data }: { id: string; data: Partial<AirlineRule> }) => {
       return await apiRequest("PATCH", `/api/rules/${id}`, data);
     },
-    onSuccess: () => {
+    onSuccess: (rule: AirlineRule) => {
       queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
       toast({
-        title: "Rule updated",
-        description: "Airline rule has been updated successfully.",
+        title: "Rule Updated",
+        description: `${rule.airline} thresholds updated successfully.`,
       });
     },
   });

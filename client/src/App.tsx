@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DemoModeToggle } from "@/components/demo-mode-toggle";
 import Dashboard from "@/pages/dashboard";
 import Flights from "@/pages/flights";
 import Bottles from "@/pages/bottles";
@@ -41,9 +42,18 @@ export default function App() {
           <div className="flex h-screen w-full">
             <AppSidebar />
             <div className="flex flex-col flex-1 overflow-hidden">
-              <header className="flex items-center justify-between p-4 border-b border-border bg-background sticky top-0 z-10">
-                <SidebarTrigger data-testid="button-sidebar-toggle" />
-                <ThemeToggle />
+              <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-background sticky top-0 z-10">
+                <div className="flex items-center gap-4">
+                  <SidebarTrigger data-testid="button-sidebar-toggle" />
+                  <div className="flex flex-col">
+                    <h1 className="text-xl font-bold text-foreground">SmartCater</h1>
+                    <p className="text-xs text-muted-foreground">Intelligent Catering Execution for GateGroup</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <DemoModeToggle />
+                  <ThemeToggle />
+                </div>
               </header>
               <main className="flex-1 overflow-auto p-6">
                 <Router />

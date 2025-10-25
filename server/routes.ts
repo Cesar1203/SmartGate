@@ -237,6 +237,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/metrics/employees", async (_req, res) => {
+    try {
+      const employees = await storage.getEmployeeMetrics();
+      res.json(employees);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch employee metrics" });
+    }
+  });
+
+  // Demo mode routes
+  app.post("/api/demo/load", async (_req, res) => {
+    try {
+      await storage.loadDemoData();
+      res.json({ success: true, message: "Demo data loaded successfully" });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to load demo data" });
+    }
+  });
+
+  app.post("/api/demo/clear", async (_req, res) => {
+    try {
+      await storage.clearAllData();
+      res.json({ success: true, message: "All data cleared successfully" });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to clear data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

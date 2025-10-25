@@ -40,14 +40,14 @@ export default function Flights() {
     mutationFn: async (data: InsertFlight) => {
       return await apiRequest("POST", "/api/flights", data);
     },
-    onSuccess: () => {
+    onSuccess: (flight: Flight) => {
       queryClient.invalidateQueries({ queryKey: ["/api/flights"] });
       queryClient.invalidateQueries({ queryKey: ["/api/metrics"] });
       setIsDialogOpen(false);
       form.reset();
       toast({
-        title: "Flight created",
-        description: "Flight has been added successfully.",
+        title: "Flight Created Successfully",
+        description: `${flight.flightNumber} to ${flight.destination} has been added to the system.`,
       });
     },
     onError: (error: Error) => {
@@ -63,11 +63,13 @@ export default function Flights() {
     mutationFn: async (flightId: string) => {
       return await apiRequest("POST", `/api/flights/${flightId}/check-reliability`, {});
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/flights"] });
+      const reliability = data.reliability;
+      const warningMessage = reliability < 70 ? " Weather risk detected." : "";
       toast({
-        title: "Reliability updated",
-        description: "Flight reliability has been recalculated based on current weather.",
+        title: `Reliability: ${reliability.toFixed(0)}%`,
+        description: `${data.recommendation}${warningMessage}`,
       });
     },
   });

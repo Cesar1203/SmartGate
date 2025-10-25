@@ -122,6 +122,15 @@ export interface DashboardMetrics {
   trolleyErrorRate: number;
 }
 
+// Employee metrics
+export interface EmployeeMetric {
+  employeeName: string;
+  avgPrepTime: number;
+  errorRate: number;
+  complianceRate: number;
+  trolleysProcessed: number;
+}
+
 // Chart data for trends
 export interface TrendData {
   date: string;

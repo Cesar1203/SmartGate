@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plane, TrendingUp, Users, PackageCheck, Wine, AlertTriangle } from "lucide-react";
+import { Plane, TrendingUp, Users, PackageCheck, Wine, AlertTriangle, Clock, Target, CheckCircle2 } from "lucide-react";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import type { DashboardMetrics, TrendData } from "@shared/schema";
+import type { DashboardMetrics, TrendData, EmployeeMetric } from "@shared/schema";
 
 export default function Dashboard() {
   const { data: metrics, isLoading } = useQuery<DashboardMetrics>({
@@ -15,6 +15,10 @@ export default function Dashboard() {
 
   const { data: foodSavedTrend } = useQuery<TrendData[]>({
     queryKey: ["/api/metrics/food-saved-trend"],
+  });
+
+  const { data: employeeMetrics } = useQuery<EmployeeMetric[]>({
+    queryKey: ["/api/metrics/employees"],
   });
 
   if (isLoading) {
@@ -219,6 +223,65 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Employee Performance Metrics */}
+      {employeeMetrics && employeeMetrics.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Employee Performance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Employee</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Avg. Prep Time</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Error Rate</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Compliance</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Trolleys</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employeeMetrics.map((employee, index) => (
+                    <tr key={index} className="border-b last:border-0 hover-elevate">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">{employee.employeeName}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Clock className="h-3 w-3 text-muted-foreground" />
+                          <span className="font-mono">{employee.avgPrepTime.toFixed(1)} min</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <span className={`font-mono ${employee.errorRate < 3 ? 'text-chart-2' : 'text-chart-5'}`}>
+                          {employee.errorRate.toFixed(1)}%
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <CheckCircle2 className="h-3 w-3 text-chart-2" />
+                          <span className="font-mono text-chart-2">{employee.complianceRate.toFixed(1)}%</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Target className="h-3 w-3 text-muted-foreground" />
+                          <span className="font-mono">{employee.trolleysProcessed}</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

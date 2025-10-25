@@ -1,12 +1,60 @@
 import type { WeatherData } from "@shared/schema";
 
-// Mock weather service for MVP
-// In production, this would integrate with OpenWeatherMap or similar API
-export async function getWeatherData(destination: string, dateTime: Date): Promise<WeatherData> {
-  // Simulate API call delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+const OPENWEATHERMAP_API_KEY = process.env.OPENWEATHERMAP_API_KEY;
 
-  // Generate mock weather data with some variability
+// Extract airport code from destination string (e.g., "New York (JFK)" -> "JFK")
+function extractAirportCode(destination: string): string {
+  const match = destination.match(/\(([A-Z]{3})\)/);
+  return match ? match[1] : destination;
+}
+
+// Airport coordinates for major airports
+const airportCoordinates: Record<string, { lat: number; lon: number }> = {
+  JFK: { lat: 40.6413, lon: -73.7781 },
+  LAX: { lat: 33.9416, lon: -118.4085 },
+  ORD: { lat: 41.9742, lon: -87.9073 },
+  ATL: { lat: 33.6407, lon: -84.4277 },
+  DFW: { lat: 32.8998, lon: -97.0403 },
+  MIA: { lat: 25.7959, lon: -80.2870 },
+  LHR: { lat: 51.4700, lon: -0.4543 },
+  CDG: { lat: 49.0097, lon: 2.5479 },
+};
+
+export async function getWeatherData(destination: string, dateTime: Date): Promise<WeatherData> {
+  const airportCode = extractAirportCode(destination);
+  const coords = airportCoordinates[airportCode];
+
+  // If no API key or unknown airport, use mock data
+  if (!OPENWEATHERMAP_API_KEY || !coords) {
+    return getMockWeatherData();
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${OPENWEATHERMAP_API_KEY}&units=metric`
+    );
+
+    if (!response.ok) {
+      console.warn("Weather API request failed, using mock data");
+      return getMockWeatherData();
+    }
+
+    const data = await response.json();
+
+    return {
+      temperature: Math.round(data.main.temp),
+      windSpeed: Math.round(data.wind.speed * 3.6), // m/s to km/h
+      precipitation: data.rain?.["1h"] ? Math.round(data.rain["1h"] * 100) : 0,
+      visibility: Math.round(data.visibility / 1000), // meters to km
+      conditions: data.weather[0]?.main || "Clear",
+    };
+  } catch (error) {
+    console.warn("Weather API error, using mock data:", error);
+    return getMockWeatherData();
+  }
+}
+
+function getMockWeatherData(): WeatherData {
   const randomFactor = Math.random();
   const conditions = ["Clear", "Partly Cloudy", "Cloudy", "Rain", "Thunderstorm", "Fog"];
   const conditionIndex = Math.floor(randomFactor * conditions.length);
