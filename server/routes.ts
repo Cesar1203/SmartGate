@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertFlightSchema, insertAirlineRuleSchema, insertOrderSchema, type ProductQuantities } from "@shared/schema";
+import { insertFlightSchema, insertAirlineRuleSchema } from "@shared/schema";
 import { analyzeBottleImage, verifyTrolleyImage } from "./openai";
 import { getWeatherData, calculateFlightReliability, getReliabilityRecommendation } from "./weather";
 
@@ -243,129 +243,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(employees);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch employee metrics" });
-    }
-  });
-
-  // Order routes
-  app.get("/api/orders", async (_req, res) => {
-    try {
-      const orders = await storage.getOrders();
-      res.json(orders);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch orders" });
-    }
-  });
-
-  app.get("/api/orders/:id", async (req, res) => {
-    try {
-      const order = await storage.getOrder(req.params.id);
-      if (!order) {
-        return res.status(404).json({ error: "Order not found" });
-      }
-      res.json(order);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch order" });
-    }
-  });
-
-  app.post("/api/orders", async (req, res) => {
-    try {
-      const validated = insertOrderSchema.parse(req.body);
-      
-      // Calculate reliability and recommendations automatically
-      const weather = await getWeatherData(validated.destination, new Date(validated.departureTime));
-      const reliability = calculateFlightReliability(weather);
-      
-      // Calculate risk level and recommendations
-      let riskLevel: "low" | "moderate" | "high";
-      let adjustmentPercentage: number;
-      let message: string;
-      
-      if (reliability >= 80) {
-        riskLevel = "low";
-        adjustmentPercentage = 0;
-        message = "Alta confiabilidad → carga completa recomendada";
-      } else if (reliability >= 60) {
-        riskLevel = "moderate";
-        adjustmentPercentage = 30;
-        message = "Riesgo moderado → sugerimos reducir 30% la comida fresca";
-      } else {
-        riskLevel = "high";
-        adjustmentPercentage = 50;
-        message = "Riesgo alto → solo pedidos esenciales, reducir 50%";
-      }
-      
-      // Calculate adjusted products
-      const requested = validated.requestedProducts;
-      const adjustedProducts: ProductQuantities = {
-        meals: Math.ceil(requested.meals * (1 - adjustmentPercentage / 100)),
-        snacks: requested.snacks, // Snacks don't spoil as quickly
-        beverages: requested.beverages, // Beverages are stable
-      };
-      
-      // Create order with all calculated data
-      const order = await storage.createOrder({
-        ...validated,
-        reliability,
-        weatherData: weather,
-        recommendations: message,
-        adjustedProducts,
-      });
-      
-      res.status(201).json({
-        order,
-        recommendation: {
-          reliability,
-          weather,
-          riskLevel,
-          message,
-          suggestedProducts: adjustedProducts,
-          adjustmentPercentage,
-        },
-      });
-    } catch (error: any) {
-      res.status(400).json({ error: error.message || "Invalid order data" });
-    }
-  });
-
-  app.post("/api/orders/:id/confirm", async (req, res) => {
-    try {
-      const order = await storage.getOrder(req.params.id);
-      if (!order) {
-        return res.status(404).json({ error: "Order not found" });
-      }
-      
-      const updated = await storage.updateOrder(order.id, {
-        status: "confirmed" as any,
-      });
-      
-      res.json(updated);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message || "Failed to confirm order" });
-    }
-  });
-
-  app.patch("/api/orders/:id", async (req, res) => {
-    try {
-      const updated = await storage.updateOrder(req.params.id, req.body);
-      if (!updated) {
-        return res.status(404).json({ error: "Order not found" });
-      }
-      res.json(updated);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message || "Failed to update order" });
-    }
-  });
-
-  app.delete("/api/orders/:id", async (req, res) => {
-    try {
-      const deleted = await storage.deleteOrder(req.params.id);
-      if (!deleted) {
-        return res.status(404).json({ error: "Order not found" });
-      }
-      res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to delete order" });
     }
   });
 
