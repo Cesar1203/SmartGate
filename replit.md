@@ -4,6 +4,41 @@
 
 SmartCater is an enterprise operations platform designed for GateGroup to optimize airline catering operations through AI-powered smart execution. The system focuses on four core modules: automated bottle handling with computer vision, real-time trolley verification, flight reliability prediction based on weather data, and dynamic resource replanning. Built as a mission-critical tool, it prioritizes operational efficiency, high information density, and real-time decision support for catering staff managing flight preparations.
 
+## Enhanced Demo Mode
+
+SmartCater includes a comprehensive demo mode with rich sample data for demonstration and testing purposes:
+
+**Demo Data Coverage**:
+- **17 Flights** across 6 international airlines:
+  - AeroMexico (AM): 4 flights with mix of scheduled/delayed status
+  - American Airlines (AA): 3 flights including delayed scenarios
+  - Delta (DL): 3 flights with cancelled example
+  - United (UA): 3 flights including delayed scenario
+  - Lufthansa (LH): 2 long-haul European flights
+  - Air France (AF): 2 European destination flights
+- **12 Bottle Analyses** covering diverse beverage types:
+  - Wine varieties (Red, White, Rosé), Champagne, Prosecco
+  - Spirits: Vodka, Gin, Rum, Whiskey, Bourbon, Cognac, Tequila
+  - Fill levels ranging from 15% to 95%
+  - Recommendations distributed across reuse/combine/discard actions
+- **10 Trolley Verifications** with realistic scenarios:
+  - Multiple cabin classes: Economy, Premium Economy, Business, First Class
+  - Mix of successful verifications (no errors) and failed (with detailed error lists)
+  - Various error types: missing items, incorrect positioning, inventory mismatches
+- **6 Airline Rules** with different operational thresholds:
+  - Custom reuse and combine thresholds per airline (ranging from 65-80% for reuse)
+- **8 Employee Performance Metrics**:
+  - Diverse team with varied efficiency scores, error rates, and compliance rates
+  - Average prep times ranging from 11.2 to 14.2 minutes
+  - Trolleys processed ranging from 38 to 56 units
+
+**Demo Data Reload Feature**:
+- One-click reload via "Reload Demo Data" button on Dashboard
+- API endpoint: `POST /api/demo/load`
+- Clears all existing data and loads fresh demo dataset
+- Invalidates all query caches for immediate UI refresh
+- Toast notification confirms successful reload
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
