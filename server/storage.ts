@@ -73,9 +73,15 @@ export class MemStorage implements IStorage {
   async createFlight(insertFlight: InsertFlight): Promise<Flight> {
     const id = randomUUID();
     const flight: Flight = {
-      ...insertFlight,
       id,
+      flightNumber: insertFlight.flightNumber,
+      departureTime: insertFlight.departureTime,
+      destination: insertFlight.destination,
+      airline: insertFlight.airline,
+      status: insertFlight.status as any,
       reliability: null,
+      plannedMeals: insertFlight.plannedMeals || 0,
+      plannedBottles: insertFlight.plannedBottles || 0,
       actualMeals: null,
       actualBottles: null,
     };
@@ -107,7 +113,12 @@ export class MemStorage implements IStorage {
 
   async createAirlineRule(insertRule: InsertAirlineRule): Promise<AirlineRule> {
     const id = randomUUID();
-    const rule: AirlineRule = { ...insertRule, id };
+    const rule: AirlineRule = {
+      id,
+      airline: insertRule.airline,
+      reuseThreshold: insertRule.reuseThreshold || 70,
+      combineThreshold: insertRule.combineThreshold || 40,
+    };
     this.airlineRules.set(id, rule);
     return rule;
   }
@@ -131,8 +142,13 @@ export class MemStorage implements IStorage {
   async createBottleAnalysis(insertAnalysis: InsertBottleAnalysis): Promise<BottleAnalysis> {
     const id = randomUUID();
     const analysis: BottleAnalysis = {
-      ...insertAnalysis,
       id,
+      flightId: insertAnalysis.flightId ?? null,
+      imageData: insertAnalysis.imageData ?? null,
+      bottleType: insertAnalysis.bottleType ?? null,
+      fillLevel: insertAnalysis.fillLevel ?? null,
+      recommendedAction: (insertAnalysis.recommendedAction as "reuse" | "combine" | "discard" | null) ?? null,
+      aiAnalysis: insertAnalysis.aiAnalysis ?? null,
       timestamp: new Date(),
     };
     this.bottleAnalyses.push(analysis);
@@ -149,8 +165,13 @@ export class MemStorage implements IStorage {
   async createTrolleyVerification(insertVerification: InsertTrolleyVerification): Promise<TrolleyVerification> {
     const id = randomUUID();
     const verification: TrolleyVerification = {
-      ...insertVerification,
       id,
+      flightId: insertVerification.flightId ?? null,
+      imageData: insertVerification.imageData ?? null,
+      aiAnalysis: insertVerification.aiAnalysis ?? null,
+      goldenLayoutName: insertVerification.goldenLayoutName ?? null,
+      hasErrors: insertVerification.hasErrors || 0,
+      errors: insertVerification.errors as string[] | null ?? null,
       timestamp: new Date(),
     };
     this.trolleyVerifications.push(verification);
