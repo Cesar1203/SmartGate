@@ -1,9 +1,10 @@
 import type { Flight, AirlineRule, EmployeeMetric, BottleAnalysis, TrolleyVerification, TrendData } from "./schema";
 
 export const demoFlights: Omit<Flight, "id">[] = [
+  // AeroMexico Flights
   {
     flightNumber: "AM651",
-    departureTime: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
+    departureTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
     destination: "New York (JFK)",
     airline: "AeroMexico",
     status: "scheduled",
@@ -15,7 +16,7 @@ export const demoFlights: Omit<Flight, "id">[] = [
   },
   {
     flightNumber: "AM245",
-    departureTime: new Date(Date.now() + 3 * 60 * 60 * 1000), // 3 hours from now
+    departureTime: new Date(Date.now() + 3 * 60 * 60 * 1000),
     destination: "Mexico City (MEX)",
     airline: "AeroMexico",
     status: "delayed",
@@ -27,7 +28,7 @@ export const demoFlights: Omit<Flight, "id">[] = [
   },
   {
     flightNumber: "AM892",
-    departureTime: new Date(Date.now() + 5 * 60 * 60 * 1000), // 5 hours from now
+    departureTime: new Date(Date.now() + 5 * 60 * 60 * 1000),
     destination: "Guadalajara (GDL)",
     airline: "AeroMexico",
     status: "scheduled",
@@ -38,20 +39,22 @@ export const demoFlights: Omit<Flight, "id">[] = [
     actualBottles: null,
   },
   {
-    flightNumber: "UA1234",
-    departureTime: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 hours from now
-    destination: "Los Angeles (LAX)",
-    airline: "United",
+    flightNumber: "AM104",
+    departureTime: new Date(Date.now() + 7 * 60 * 60 * 1000),
+    destination: "Monterrey (MTY)",
+    airline: "AeroMexico",
     status: "scheduled",
-    plannedMeals: 220,
-    plannedBottles: 110,
-    reliability: 60,
+    plannedMeals: 120,
+    plannedBottles: 60,
+    reliability: 92,
     actualMeals: null,
     actualBottles: null,
   },
+
+  // American Airlines Flights
   {
     flightNumber: "AA789",
-    departureTime: new Date(Date.now() + 1.5 * 60 * 60 * 1000), // 1.5 hours from now
+    departureTime: new Date(Date.now() + 1.5 * 60 * 60 * 1000),
     destination: "Miami (MIA)",
     airline: "American Airlines",
     status: "delayed",
@@ -63,7 +66,7 @@ export const demoFlights: Omit<Flight, "id">[] = [
   },
   {
     flightNumber: "AA456",
-    departureTime: new Date(Date.now() + 3.5 * 60 * 60 * 1000), // 3.5 hours from now
+    departureTime: new Date(Date.now() + 3.5 * 60 * 60 * 1000),
     destination: "Dallas (DFW)",
     airline: "American Airlines",
     status: "scheduled",
@@ -74,8 +77,22 @@ export const demoFlights: Omit<Flight, "id">[] = [
     actualBottles: null,
   },
   {
+    flightNumber: "AA2101",
+    departureTime: new Date(Date.now() + 6 * 60 * 60 * 1000),
+    destination: "Chicago (ORD)",
+    airline: "American Airlines",
+    status: "scheduled",
+    plannedMeals: 210,
+    plannedBottles: 105,
+    reliability: 82,
+    actualMeals: null,
+    actualBottles: null,
+  },
+
+  // Delta Flights
+  {
     flightNumber: "DL456",
-    departureTime: new Date(Date.now() + 8 * 60 * 60 * 1000), // 8 hours from now
+    departureTime: new Date(Date.now() + 8 * 60 * 60 * 1000),
     destination: "Atlanta (ATL)",
     airline: "Delta",
     status: "scheduled",
@@ -87,13 +104,115 @@ export const demoFlights: Omit<Flight, "id">[] = [
   },
   {
     flightNumber: "DL321",
-    departureTime: new Date(Date.now() + 2.5 * 60 * 60 * 1000), // 2.5 hours from now
+    departureTime: new Date(Date.now() + 2.5 * 60 * 60 * 1000),
     destination: "Detroit (DTW)",
     airline: "Delta",
     status: "cancelled",
     plannedMeals: 170,
     plannedBottles: 85,
     reliability: 30,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "DL1955",
+    departureTime: new Date(Date.now() + 4.5 * 60 * 60 * 1000),
+    destination: "Seattle (SEA)",
+    airline: "Delta",
+    status: "scheduled",
+    plannedMeals: 185,
+    plannedBottles: 92,
+    reliability: 87,
+    actualMeals: null,
+    actualBottles: null,
+  },
+
+  // United Flights
+  {
+    flightNumber: "UA1234",
+    departureTime: new Date(Date.now() + 4 * 60 * 60 * 1000),
+    destination: "Los Angeles (LAX)",
+    airline: "United",
+    status: "scheduled",
+    plannedMeals: 220,
+    plannedBottles: 110,
+    reliability: 60,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "UA567",
+    departureTime: new Date(Date.now() + 5.5 * 60 * 60 * 1000),
+    destination: "San Francisco (SFO)",
+    airline: "United",
+    status: "scheduled",
+    plannedMeals: 195,
+    plannedBottles: 98,
+    reliability: 75,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "UA892",
+    departureTime: new Date(Date.now() + 1 * 60 * 60 * 1000),
+    destination: "Houston (IAH)",
+    airline: "United",
+    status: "delayed",
+    plannedMeals: 165,
+    plannedBottles: 82,
+    reliability: 55,
+    actualMeals: null,
+    actualBottles: null,
+  },
+
+  // Lufthansa Flights
+  {
+    flightNumber: "LH498",
+    departureTime: new Date(Date.now() + 9 * 60 * 60 * 1000),
+    destination: "Frankfurt (FRA)",
+    airline: "Lufthansa",
+    status: "scheduled",
+    plannedMeals: 280,
+    plannedBottles: 140,
+    reliability: 94,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "LH462",
+    departureTime: new Date(Date.now() + 10 * 60 * 60 * 1000),
+    destination: "Munich (MUC)",
+    airline: "Lufthansa",
+    status: "scheduled",
+    plannedMeals: 250,
+    plannedBottles: 125,
+    reliability: 89,
+    actualMeals: null,
+    actualBottles: null,
+  },
+
+  // Air France Flights
+  {
+    flightNumber: "AF438",
+    departureTime: new Date(Date.now() + 11 * 60 * 60 * 1000),
+    destination: "Paris (CDG)",
+    airline: "Air France",
+    status: "scheduled",
+    plannedMeals: 260,
+    plannedBottles: 130,
+    reliability: 91,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "AF662",
+    departureTime: new Date(Date.now() + 12 * 60 * 60 * 1000),
+    destination: "Nice (NCE)",
+    airline: "Air France",
+    status: "scheduled",
+    plannedMeals: 175,
+    plannedBottles: 88,
+    reliability: 86,
     actualMeals: null,
     actualBottles: null,
   },
@@ -114,6 +233,21 @@ export const demoRules: Omit<AirlineRule, "id">[] = [
     airline: "American Airlines",
     reuseThreshold: 65,
     combineThreshold: 45,
+  },
+  {
+    airline: "Delta",
+    reuseThreshold: 72,
+    combineThreshold: 38,
+  },
+  {
+    airline: "Lufthansa",
+    reuseThreshold: 80,
+    combineThreshold: 30,
+  },
+  {
+    airline: "Air France",
+    reuseThreshold: 78,
+    combineThreshold: 32,
   },
 ];
 
@@ -146,20 +280,47 @@ export const demoEmployeeMetrics: EmployeeMetric[] = [
     complianceRate: 97.3,
     trolleysProcessed: 41,
   },
+  {
+    employeeName: "Ahmed Hassan",
+    avgPrepTime: 12.9,
+    errorRate: 2.3,
+    complianceRate: 97.7,
+    trolleysProcessed: 47,
+  },
+  {
+    employeeName: "Sophie Martin",
+    avgPrepTime: 11.2,
+    errorRate: 1.5,
+    complianceRate: 98.5,
+    trolleysProcessed: 56,
+  },
+  {
+    employeeName: "Raj Patel",
+    avgPrepTime: 13.8,
+    errorRate: 3.1,
+    complianceRate: 96.9,
+    trolleysProcessed: 39,
+  },
+  {
+    employeeName: "Emma Johnson",
+    avgPrepTime: 12.3,
+    errorRate: 2.0,
+    complianceRate: 98.0,
+    trolleysProcessed: 48,
+  },
 ];
 
-// Demo bottle analyses (omit id and timestamp, will be generated)
 export const demoBottleAnalyses: Omit<BottleAnalysis, "id" | "timestamp">[] = [
   {
-    flightId: null, // Will be set to first demo flight
+    flightId: null,
     imageData: "data:image/png;base64,demo",
     bottleType: "Wine - Red",
     fillLevel: 85,
     recommendedAction: "reuse",
-    aiAnalysis: "Bottle appears to be 85% full with wine. Recommended for reuse on next flight.",
+    aiAnalysis: "Bottle appears to be 85% full with red wine. Seal intact, excellent condition for reuse on next flight.",
   },
   {
-    flightId: null, // Will be set to first demo flight
+    flightId: null,
     imageData: "data:image/png;base64,demo",
     bottleType: "Champagne",
     fillLevel: 55,
@@ -167,7 +328,7 @@ export const demoBottleAnalyses: Omit<BottleAnalysis, "id" | "timestamp">[] = [
     aiAnalysis: "Bottle is 55% full. Recommended to combine with similar bottles to minimize waste.",
   },
   {
-    flightId: null, // Will be set to second demo flight
+    flightId: null,
     imageData: "data:image/png;base64,demo",
     bottleType: "Vodka",
     fillLevel: 25,
@@ -175,44 +336,162 @@ export const demoBottleAnalyses: Omit<BottleAnalysis, "id" | "timestamp">[] = [
     aiAnalysis: "Bottle is only 25% full. Below threshold for reuse or combination. Recommended to discard.",
   },
   {
-    flightId: null, // Will be set to second demo flight
+    flightId: null,
     imageData: "data:image/png;base64,demo",
     bottleType: "Whiskey",
     fillLevel: 78,
     recommendedAction: "reuse",
-    aiAnalysis: "Bottle is 78% full. Excellent condition for reuse on next flight.",
+    aiAnalysis: "Bottle is 78% full with whiskey. Excellent condition for reuse on next flight.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    bottleType: "Wine - White",
+    fillLevel: 92,
+    recommendedAction: "reuse",
+    aiAnalysis: "Nearly full white wine bottle (92%). Perfect for reuse, seal intact.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    bottleType: "Gin",
+    fillLevel: 48,
+    recommendedAction: "combine",
+    aiAnalysis: "Gin bottle at 48% capacity. Recommend combining with other partial bottles.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    bottleType: "Rum",
+    fillLevel: 15,
+    recommendedAction: "discard",
+    aiAnalysis: "Rum bottle only 15% full. Too low for reuse, recommend disposal.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    bottleType: "Cognac",
+    fillLevel: 88,
+    recommendedAction: "reuse",
+    aiAnalysis: "Premium cognac bottle at 88% full. High value, excellent for reuse.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    bottleType: "Tequila",
+    fillLevel: 42,
+    recommendedAction: "combine",
+    aiAnalysis: "Tequila at 42% fill level. Combine with similar bottles to optimize inventory.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    bottleType: "Wine - Rosé",
+    fillLevel: 67,
+    recommendedAction: "reuse",
+    aiAnalysis: "Rosé wine bottle at 67% full. Good condition for reuse on similar flight class.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    bottleType: "Prosecco",
+    fillLevel: 95,
+    recommendedAction: "reuse",
+    aiAnalysis: "Almost full prosecco bottle (95%). Excellent condition, priority for reuse.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    bottleType: "Bourbon",
+    fillLevel: 38,
+    recommendedAction: "combine",
+    aiAnalysis: "Bourbon at 38% capacity. Within combine threshold, consolidate with similar bottles.",
   },
 ];
 
-// Demo trolley verifications (omit id and timestamp, will be generated)
 export const demoTrolleyVerifications: Omit<TrolleyVerification, "id" | "timestamp">[] = [
   {
-    flightId: null, // Will be set to first demo flight
+    flightId: null,
     imageData: "data:image/png;base64,demo",
     goldenLayoutName: "Standard Economy Layout",
     hasErrors: 0,
     errors: [],
-    aiAnalysis: "All items correctly positioned. Trolley matches golden layout perfectly.",
+    aiAnalysis: "All items correctly positioned. Trolley matches golden layout perfectly. 100% compliance achieved.",
   },
   {
-    flightId: null, // Will be set to second demo flight
+    flightId: null,
     imageData: "data:image/png;base64,demo",
     goldenLayoutName: "Business Class Layout",
     hasErrors: 1,
     errors: ["Missing 1 drink item in row 3", "Incorrect snack type detected in row 2"],
-    aiAnalysis: "Trolley verification failed. Found 2 discrepancies compared to golden layout.",
+    aiAnalysis: "Trolley verification failed. Found 2 discrepancies compared to golden layout. Requires correction before sealing.",
   },
   {
-    flightId: null, // Will be set to third demo flight
+    flightId: null,
     imageData: "data:image/png;base64,demo",
     goldenLayoutName: "Premium Economy Layout",
     hasErrors: 0,
     errors: [],
-    aiAnalysis: "Perfect match with golden layout. No errors detected.",
+    aiAnalysis: "Perfect match with golden layout. No errors detected. Ready for flight deployment.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    goldenLayoutName: "First Class Layout",
+    hasErrors: 1,
+    errors: ["Missing champagne bottle in compartment A4", "Extra meal tray detected in row 5", "Wine selection mismatch in row 1"],
+    aiAnalysis: "3 discrepancies detected in first class trolley. High-value items affected, immediate correction required.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    goldenLayoutName: "Standard Economy Layout",
+    hasErrors: 0,
+    errors: [],
+    aiAnalysis: "Trolley configuration matches specification. All 24 positions verified correctly.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    goldenLayoutName: "Business Class Layout",
+    hasErrors: 1,
+    errors: ["Dessert item positioned incorrectly in row 4"],
+    aiAnalysis: "Minor positioning error detected. Single dessert item needs relocation to proper compartment.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    goldenLayoutName: "Premium Economy Layout",
+    hasErrors: 0,
+    errors: [],
+    aiAnalysis: "Excellent preparation. All items present and correctly positioned per airline specification.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    goldenLayoutName: "Standard Economy Layout",
+    hasErrors: 1,
+    errors: ["Missing 2 water bottles in row 6", "Snack count mismatch in compartment B3"],
+    aiAnalysis: "Inventory discrepancy detected. 2 water bottles short and snack count incorrect.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    goldenLayoutName: "First Class Layout",
+    hasErrors: 0,
+    errors: [],
+    aiAnalysis: "Premium service trolley verified. All luxury items accounted for and correctly positioned.",
+  },
+  {
+    flightId: null,
+    imageData: "data:image/png;base64,demo",
+    goldenLayoutName: "Business Class Layout",
+    hasErrors: 0,
+    errors: [],
+    aiAnalysis: "Business class trolley meets all requirements. Ready for cabin deployment.",
   },
 ];
 
-// Fixed trend data for consistent demo mode
 export const demoEfficiencyTrend: TrendData[] = [
   { date: "Oct 19", value: 94.2 },
   { date: "Oct 20", value: 95.8 },
