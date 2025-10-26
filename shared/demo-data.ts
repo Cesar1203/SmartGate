@@ -216,6 +216,58 @@ export const demoFlights: Omit<Flight, "id">[] = [
     actualMeals: null,
     actualBottles: null,
   },
+
+  // Volaris Flights (Mexican Low-Cost Carrier)
+  {
+    flightNumber: "Y4301",
+    departureTime: new Date(Date.now() + 3.2 * 60 * 60 * 1000),
+    destination: "Tijuana (TIJ)",
+    airline: "Volaris",
+    status: "scheduled",
+    plannedMeals: 130,
+    plannedBottles: 65,
+    reliability: 81,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "Y4725",
+    departureTime: new Date(Date.now() + 5.8 * 60 * 60 * 1000),
+    destination: "Cancún (CUN)",
+    airline: "Volaris",
+    status: "scheduled",
+    plannedMeals: 155,
+    plannedBottles: 78,
+    reliability: 85,
+    actualMeals: null,
+    actualBottles: null,
+  },
+
+  // VivaAerobus Flights (Mexican Ultra Low-Cost Carrier)
+  {
+    flightNumber: "VB2104",
+    departureTime: new Date(Date.now() + 4.3 * 60 * 60 * 1000),
+    destination: "Puerto Vallarta (PVR)",
+    airline: "VivaAerobus",
+    status: "scheduled",
+    plannedMeals: 125,
+    plannedBottles: 62,
+    reliability: 79,
+    actualMeals: null,
+    actualBottles: null,
+  },
+  {
+    flightNumber: "VB1890",
+    departureTime: new Date(Date.now() + 6.5 * 60 * 60 * 1000),
+    destination: "Los Cabos (SJD)",
+    airline: "VivaAerobus",
+    status: "scheduled",
+    plannedMeals: 110,
+    plannedBottles: 55,
+    reliability: 76,
+    actualMeals: null,
+    actualBottles: null,
+  },
 ];
 
 export const demoRules: Omit<AirlineRule, "id">[] = [
@@ -248,6 +300,16 @@ export const demoRules: Omit<AirlineRule, "id">[] = [
     airline: "Air France",
     reuseThreshold: 78,
     combineThreshold: 32,
+  },
+  {
+    airline: "Volaris",
+    reuseThreshold: 68,
+    combineThreshold: 42,
+  },
+  {
+    airline: "VivaAerobus",
+    reuseThreshold: 65,
+    combineThreshold: 45,
   },
 ];
 
