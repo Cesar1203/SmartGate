@@ -387,21 +387,31 @@ export class MemStorage implements IStorage {
   }
 
   async getEfficiencyTrend(): Promise<TrendData[]> {
-    // Return fixed demo trend data for consistent demo mode
+    // Only return trend data if demo data is loaded (flights exist)
+    if (this.flights.size === 0) {
+      return [];
+    }
     const { demoEfficiencyTrend } = await import("@shared/demo-data");
     return demoEfficiencyTrend;
   }
 
   async getFoodSavedTrend(): Promise<TrendData[]> {
-    // Return fixed demo trend data for consistent demo mode
+    // Only return trend data if demo data is loaded (flights exist)
+    if (this.flights.size === 0) {
+      return [];
+    }
     const { demoFoodSavedTrend } = await import("@shared/demo-data");
     return demoFoodSavedTrend;
   }
 
   async getEmployeeMetrics(): Promise<EmployeeMetric[]> {
-    // Return user-created metrics, or demo data if none exist
+    // Return user-created metrics, or demo data if flights exist
     if (this.employeeMetrics.length > 0) {
       return [...this.employeeMetrics];
+    }
+    // Only return demo employee metrics if demo data is loaded (flights exist)
+    if (this.flights.size === 0) {
+      return [];
     }
     const { demoEmployeeMetrics } = await import("@shared/demo-data");
     return demoEmployeeMetrics;
