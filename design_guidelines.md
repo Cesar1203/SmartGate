@@ -1,9 +1,9 @@
-# SmartCater Design Guidelines
+# SmartGate Design Guidelines
 
 ## Design Approach
 **System**: Hybrid approach inspired by Linear's clarity + Material Design's enterprise patterns + Notion's modular flexibility
 
-**Justification**: SmartCater is a mission-critical enterprise operations tool requiring high information density, real-time data visualization, and efficient workflows. The design prioritizes clarity, scanability, and rapid decision-making over aesthetic flourishes.
+**Justification**: SmartGate is a mission-critical enterprise operations tool requiring high information density, real-time data visualization, and efficient workflows. The design prioritizes clarity, scanability, and rapid decision-making over aesthetic flourishes.
 
 **Core Principles**:
 - Information First: Data visibility and clarity trump decorative elements

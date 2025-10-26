@@ -50,7 +50,7 @@ export default function App() {
                 <div className="flex items-center gap-4">
                   <SidebarTrigger data-testid="button-sidebar-toggle" />
                   <div className="flex flex-col">
-                    <h1 className="text-xl font-bold text-foreground">SmartCater</h1>
+                    <h1 className="text-xl font-bold text-foreground">SmartGate</h1>
                     <p className="text-xs text-muted-foreground">Intelligent Catering Execution for GateGroup</p>
                   </div>
                 </div>

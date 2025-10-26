@@ -67,7 +67,7 @@ export function AppSidebar() {
             <Plane className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-sidebar-foreground">SmartCater</h1>
+            <h1 className="text-lg font-bold text-sidebar-foreground">SmartGate</h1>
             <p className="text-xs text-muted-foreground">GateGroup Operations</p>
           </div>
         </div>
