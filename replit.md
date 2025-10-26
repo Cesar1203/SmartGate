@@ -93,11 +93,11 @@ Preferred communication style: Simple, everyday language.
 - Metrics aggregation endpoints for dashboard data
 
 **AI Integration Strategy**
-- OpenAI GPT-5 (latest model) for vision-based analysis
-- Bottle analysis: Computer vision on base64 images to detect bottle type and fill level
-- Trolley verification: Image comparison against golden layouts to detect discrepancies
+- Roboflow API for computer vision-based image analysis (replaced OpenAI)
+- Bottle analysis: Object detection on base64 images to detect bottle type and estimate fill level
+- Trolley verification: Item detection to validate trolley layout against expected configuration
 - Configurable thresholds per airline for business rule enforcement
-- Structured JSON responses for consistent parsing
+- Fallback to simulated analysis when API is unavailable for uninterrupted demo functionality
 
 ### Data Storage Solutions
 
@@ -162,10 +162,14 @@ Preferred communication style: Simple, everyday language.
 ### External Dependencies
 
 **AI Services**
-- OpenAI API (GPT-5 model) for vision analysis
-- Required: `OPENAI_API_KEY` environment variable
+- Roboflow API for computer vision and object detection
+- Required: `ROBOFLOW_API_KEY` environment variable
+- Optional configuration:
+  - `ROBOFLOW_BOTTLE_MODEL`: Custom bottle detection model ID (default: "bottle-detection/1")
+  - `ROBOFLOW_TROLLEY_MODEL`: Custom trolley verification model ID (default: "trolley-verification/1")
 - Used for: Bottle image analysis, trolley layout verification
-- Structured prompts for consistent JSON responses
+- API endpoint: `https://detect.roboflow.com/{model-id}/{version}`
+- Fallback behavior: Simulated analysis for demo when API unavailable
 
 **Weather Integration**
 - Mock implementation in current MVP
