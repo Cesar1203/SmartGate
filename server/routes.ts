@@ -353,11 +353,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Employee name is required" });
       }
 
+      const completionTime = new Date();
       const updated = await storage.updateOrder(req.params.id, {
-        completionTime: new Date(),
+        completionTime,
         completedBy: req.body.completedBy,
         status: "in_verification" as any,
       });
+
+      // Calculate prep time and update employee metrics
+      if (updated && updated.startTime) {
+        const prepTimeMinutes = (completionTime.getTime() - new Date(updated.startTime).getTime()) / (1000 * 60);
+        
+        // Get or create employee metric
+        const employees = await storage.getEmployeeMetrics();
+        const existingEmployee = employees.find(e => e.employeeName === req.body.completedBy);
+        
+        if (existingEmployee) {
+          // Update existing employee: recalculate average prep time and increment trolleys processed
+          const totalPrepTime = existingEmployee.avgPrepTime * existingEmployee.trolleysProcessed;
+          const newTrolleysProcessed = existingEmployee.trolleysProcessed + 1;
+          const newAvgPrepTime = (totalPrepTime + prepTimeMinutes) / newTrolleysProcessed;
+          
+          await storage.updateEmployeeMetric(req.body.completedBy, {
+            avgPrepTime: newAvgPrepTime,
+            trolleysProcessed: newTrolleysProcessed,
+          });
+        } else {
+          // Create new employee metric
+          await storage.addEmployeeMetric({
+            employeeName: req.body.completedBy,
+            avgPrepTime: prepTimeMinutes,
+            errorRate: 0,
+            complianceRate: 100,
+            trolleysProcessed: 1,
+          });
+        }
+      }
+
       res.json(updated);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to complete order" });
@@ -390,6 +422,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           errors: [],
           aiAnalysis: `Trolley ${order.trolleyId} verified for flight ${order.flightNumber}`,
           verifiedBy: req.body.verifiedBy,
+        });
+      }
+
+      // Update employee metrics for verifier
+      const employees = await storage.getEmployeeMetrics();
+      const existingEmployee = employees.find(e => e.employeeName === req.body.verifiedBy);
+      
+      if (existingEmployee) {
+        // Verifier already exists, just ensure they're tracked
+        // Error rate and compliance are calculated from verification records
+      } else {
+        // Create new employee metric for verifier
+        await storage.addEmployeeMetric({
+          employeeName: req.body.verifiedBy,
+          avgPrepTime: 0,
+          errorRate: 0,
+          complianceRate: 100,
+          trolleysProcessed: 0,
         });
       }
 
