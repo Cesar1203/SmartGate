@@ -142,22 +142,39 @@ Preferred communication style: Simple, everyday language.
 **API Endpoints**
 - `GET /api/reassignments` - Returns complete reassignment history with audit trail
 - `POST /api/reassignments/process` - Batch processes all delayed/cancelled flights
+- `POST /api/orders` - Creates pending customer orders (used by Reassign button)
+- `PATCH /api/flights/:id` - Updates flight status to "reassigned" after manual reassignment
 
-**UI Features**
-- Real-time reassignment processing via "Procesar Reasignaciones" button
+**Reassignment Workflow (English UI)**
+- **Replanning Page** (`/replanning`): 
+  - Shows delayed/cancelled flights requiring action
+  - Filters compatible flights by same airline code
+  - "Reassign" button creates pending order and updates flight status
+  - Delayed flight immediately removed from list after reassignment
+  - All UI text in English: "Process Reassignments", "Reassignment Rules", status badges
+- **Customer Orders Page** (`/orders`):
+  - Pending orders section displays reassignments awaiting confirmation
+  - All form labels and UI in English: "Flight Number", "Airline", "Meals", "Beverages"
+  - Status badges: "Pending", "Confirmed", "Delivered", "Cancelled"
+
+**UI Features (English Only)**
+- Real-time reassignment processing via "Process Reassignments" button
+- Manual reassignment via "Reassign" buttons creates pending orders
 - Color-coded status indicators:
-  - 🟢 Green (Exitoso): Successfully reassigned to same airline
-  - 🟡 Yellow (Pendiente): Awaiting confirmation
-  - 🔴 Red (Sin Vuelo): No compatible flight, food will expire
+  - 🟢 Green (Success): Successfully reassigned to same airline
+  - 🟡 Yellow (Pending): Awaiting confirmation
+  - 🔴 Red (No Flight): No compatible flight, food will expire
 - Visible airline codes and flight numbers in logs for transparency
 - Rules documentation section explaining same-airline constraint
+- Toast notifications in English confirming reassignment success
 
 **Demo Data**
 - Multiple flights per airline enable realistic testing:
-  - AeroMexico: AM651, AM245 (delayed), AM892
+  - AeroMexico: AM651, AM104, AM245 (delayed), AM892
   - American Airlines: AA789 (delayed), AA456
-  - Delta: DL456, DL321 (cancelled, no compatible flight)
+  - Delta: DL456, DL321 (cancelled), DL1955
 - Demonstrates successful same-airline reassignments and "no flight" edge cases
+- Reassigned flights change status to "reassigned" and disappear from replanning list
 
 ### External Dependencies
 
