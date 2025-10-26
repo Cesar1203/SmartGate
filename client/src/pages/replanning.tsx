@@ -55,12 +55,13 @@ export default function Replanning() {
         status: "pending",
       };
       
-      const res = await apiRequest("POST", "/api/orders", orderData);
+      // Create the pending order
+      await apiRequest("POST", "/api/orders", orderData);
       
       // Update the delayed flight status to 'reassigned' so it doesn't show in replanning anymore
-      await apiRequest("PATCH", `/api/flights/${fromFlight.id}`, { status: "reassigned" });
+      const patchRes = await apiRequest("PATCH", `/api/flights/${fromFlight.id}`, { status: "reassigned" });
       
-      return res;
+      return patchRes.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/flights"] });
@@ -113,11 +114,11 @@ export default function Replanning() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "success":
-        return <Badge variant="default" className="gap-1 bg-green-600 hover:bg-green-700">🟢 Exitoso</Badge>;
+        return <Badge variant="default" className="gap-1 bg-green-600 hover:bg-green-700">🟢 Success</Badge>;
       case "pending":
-        return <Badge variant="secondary" className="gap-1">🟡 Pendiente</Badge>;
+        return <Badge variant="secondary" className="gap-1">🟡 Pending</Badge>;
       case "no_flight":
-        return <Badge variant="destructive" className="gap-1">🔴 Sin Vuelo</Badge>;
+        return <Badge variant="destructive" className="gap-1">🔴 No Flight</Badge>;
       default:
         return null;
     }
@@ -242,7 +243,7 @@ export default function Replanning() {
                       data-testid="button-process-reassignments"
                     >
                       <RefreshCw className={`h-4 w-4 ${processReassignmentsMutation.isPending ? 'animate-spin' : ''}`} />
-                      {processReassignmentsMutation.isPending ? "Procesando..." : "Procesar Reasignaciones"}
+                      {processReassignmentsMutation.isPending ? "Processing..." : "Process Reassignments"}
                     </Button>
                   </CardContent>
                 </Card>
@@ -264,7 +265,7 @@ export default function Replanning() {
           {reassignments && reassignments.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg font-semibold">Historial de Reasignaciones</CardTitle>
+                <CardTitle className="text-lg font-semibold">Reassignment History</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {reassignments.map((reassignment) => (
@@ -292,8 +293,8 @@ export default function Replanning() {
                     
                     {reassignment.status === "success" && (
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span>{reassignment.mealsReassigned} comidas</span>
-                        <span>{reassignment.bottlesReassigned} botellas</span>
+                        <span>{reassignment.mealsReassigned} meals</span>
+                        <span>{reassignment.bottlesReassigned} bottles</span>
                       </div>
                     )}
 
@@ -309,34 +310,34 @@ export default function Replanning() {
           {/* Replanning Guide */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">Reglas de Reasignación</CardTitle>
+              <CardTitle className="text-lg font-semibold">Reassignment Rules</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div className="p-4 rounded-md bg-muted/30 border">
-                  <h4 className="text-sm font-medium mb-2">Restricción de Aerolínea</h4>
+                  <h4 className="text-sm font-medium mb-2">Airline Restriction</h4>
                   <p className="text-sm text-muted-foreground">
-                    Los alimentos frescos solo se reasignan entre vuelos de la <strong>misma aerolínea</strong>. 
-                    Nunca se reasignan alimentos entre aerolíneas diferentes (e.g., comidas de AM245 no pueden ir a DL321).
+                    Fresh food can only be reassigned between flights of the <strong>same airline</strong>. 
+                    Food is never reassigned between different airlines (e.g., AeroMexico meals cannot go to Delta flights).
                   </p>
                 </div>
 
                 <div className="p-4 rounded-md bg-muted/30 border">
-                  <h4 className="text-sm font-medium mb-2">Reglas de Prioridad</h4>
+                  <h4 className="text-sm font-medium mb-2">Priority Rules</h4>
                   <ul className="text-sm text-muted-foreground space-y-1 mt-2">
-                    <li>• Solo vuelos de la misma aerolínea (código IATA)</li>
-                    <li>• Vuelos con salida dentro de 6 horas</li>
-                    <li>• Prioridad al vuelo con salida más cercana</li>
-                    <li>• Si no hay vuelo compatible → marcar como "Expirando"</li>
+                    <li>• Only flights from the same airline (IATA code)</li>
+                    <li>• Flights departing within 6 hours</li>
+                    <li>• Priority to the closest departure time</li>
+                    <li>• If no compatible flight → mark as "Expiring"</li>
                   </ul>
                 </div>
 
                 <div className="p-4 rounded-md bg-muted/30 border">
-                  <h4 className="text-sm font-medium mb-2">Indicadores de Estado</h4>
+                  <h4 className="text-sm font-medium mb-2">Status Indicators</h4>
                   <ul className="text-sm text-muted-foreground space-y-1 mt-2">
-                    <li>🟢 <strong>Exitoso</strong> - Reasignación completada (misma aerolínea)</li>
-                    <li>🟡 <strong>Pendiente</strong> - Esperando confirmación</li>
-                    <li>🔴 <strong>Sin Vuelo</strong> - No hay vuelo compatible disponible</li>
+                    <li>🟢 <strong>Success</strong> - Reassignment completed (same airline)</li>
+                    <li>🟡 <strong>Pending</strong> - Awaiting confirmation</li>
+                    <li>🔴 <strong>No Flight</strong> - No compatible flight available</li>
                   </ul>
                 </div>
               </div>
