@@ -70,6 +70,7 @@ export interface IStorage {
   getPendingOrders(): Promise<Order[]>;
   getOrder(id: string): Promise<Order | undefined>;
   createOrder(order: InsertOrder): Promise<Order>;
+  updateOrder(id: string, data: Partial<Order>): Promise<Order | undefined>;
   updateOrderStatus(id: string, status: string): Promise<Order | undefined>;
   deleteOrder(id: string): Promise<boolean>;
 
@@ -217,11 +218,13 @@ export class MemStorage implements IStorage {
     const verification: TrolleyVerification = {
       id,
       flightId: insertVerification.flightId ?? null,
+      trolleyId: insertVerification.trolleyId ?? null,
       imageData: insertVerification.imageData ?? null,
       aiAnalysis: insertVerification.aiAnalysis ?? null,
       goldenLayoutName: insertVerification.goldenLayoutName ?? null,
       hasErrors: insertVerification.hasErrors || 0,
       errors: insertVerification.errors as string[] | null ?? null,
+      verifiedBy: insertVerification.verifiedBy ?? null,
       timestamp: new Date(),
     };
     this.trolleyVerifications.push(verification);
@@ -257,10 +260,23 @@ export class MemStorage implements IStorage {
       snacksRequested: insertOrder.snacksRequested || 0,
       beveragesRequested: insertOrder.beveragesRequested || 0,
       status: (insertOrder.status as any) || "pending",
+      trolleyId: insertOrder.trolleyId ?? null,
+      startTime: insertOrder.startTime ?? null,
+      completionTime: insertOrder.completionTime ?? null,
+      completedBy: insertOrder.completedBy ?? null,
       timestamp: new Date(),
     };
     this.orders.set(id, order);
     return order;
+  }
+
+  async updateOrder(id: string, data: Partial<Order>): Promise<Order | undefined> {
+    const order = this.orders.get(id);
+    if (!order) return undefined;
+
+    const updated = { ...order, ...data };
+    this.orders.set(id, updated);
+    return updated;
   }
 
   async updateOrderStatus(id: string, status: string): Promise<Order | undefined> {

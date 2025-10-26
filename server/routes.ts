@@ -312,7 +312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/orders/:id/complete", async (req, res) => {
+  app.post("/api/orders/:id/start", async (req, res) => {
     try {
       const order = await storage.getOrder(req.params.id);
       if (!order) {
@@ -320,10 +320,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (order.status !== "pending") {
-        return res.status(400).json({ error: "Order must be pending to complete" });
+        return res.status(400).json({ error: "Order must be pending to start" });
       }
 
-      const updated = await storage.updateOrderStatus(req.params.id, "in_verification");
+      // Generate trolley ID (TR001, TR002, etc.)
+      const allOrders = await storage.getOrders();
+      const trolleyCount = allOrders.filter(o => o.trolleyId).length;
+      const trolleyId = `TR${String(trolleyCount + 1).padStart(3, '0')}`;
+
+      const updated = await storage.updateOrder(req.params.id, {
+        startTime: new Date(),
+        trolleyId,
+      });
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to start order" });
+    }
+  });
+
+  app.post("/api/orders/:id/complete", async (req, res) => {
+    try {
+      const order = await storage.getOrder(req.params.id);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      if (!order.startTime) {
+        return res.status(400).json({ error: "Order must be started first" });
+      }
+      
+      if (!req.body.completedBy) {
+        return res.status(400).json({ error: "Employee name is required" });
+      }
+
+      const updated = await storage.updateOrder(req.params.id, {
+        completionTime: new Date(),
+        completedBy: req.body.completedBy,
+        status: "in_verification" as any,
+      });
       res.json(updated);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to complete order" });
@@ -339,6 +373,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (order.status !== "in_verification") {
         return res.status(400).json({ error: "Order must be in verification to verify" });
+      }
+      
+      if (!req.body.verifiedBy) {
+        return res.status(400).json({ error: "Employee name is required for verification" });
+      }
+
+      // Create trolley verification record
+      if (order.trolleyId) {
+        await storage.createTrolleyVerification({
+          flightId: null,
+          trolleyId: order.trolleyId,
+          imageData: null,
+          goldenLayoutName: null,
+          hasErrors: 0,
+          errors: [],
+          aiAnalysis: `Trolley ${order.trolleyId} verified for flight ${order.flightNumber}`,
+          verifiedBy: req.body.verifiedBy,
+        });
       }
 
       const updated = await storage.updateOrderStatus(req.params.id, "completed");
