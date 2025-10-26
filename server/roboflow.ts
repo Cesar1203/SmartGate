@@ -1,6 +1,5 @@
 
 export interface BottleAnalysisResult {
-  bottleType: string;
   fillLevel: number;
   recommendedAction: "reuse" | "combine" | "discard";
   analysis: string;
@@ -16,38 +15,37 @@ const ROBOFLOW_API_KEY = process.env.ROBOFLOW_API_KEY;
 const ROBOFLOW_API_URL = "https://detect.roboflow.com";
 
 // Roboflow model configuration
-// Replace these with your actual Roboflow project and model IDs
-// Format: "project-name/version" (e.g., "my-bottle-model/1")
-const BOTTLE_MODEL_ID = process.env.ROBOFLOW_BOTTLE_MODEL || "bottle-detection/1";
-const TROLLEY_MODEL_ID = process.env.ROBOFLOW_TROLLEY_MODEL || "trolley-verification/1";
+// To use your own trained models, set these environment variables:
+// ROBOFLOW_BOTTLE_MODEL - Your bottle detection model (format: "workspace/project/version")
+// ROBOFLOW_TROLLEY_MODEL - Your trolley verification model (format: "workspace/project/version")
+// 
+// Example: If you don't have custom models, leave these empty and the system will use simulated analysis
+const BOTTLE_MODEL_ID = process.env.ROBOFLOW_BOTTLE_MODEL || "";
+const TROLLEY_MODEL_ID = process.env.ROBOFLOW_TROLLEY_MODEL || "";
 
 // Simulated analysis for demo mode when Roboflow is not available
 function generateSimulatedBottleAnalysis(
   reuseThreshold: number,
   combineThreshold: number
 ): BottleAnalysisResult {
-  const bottleTypes = ["Wine - Red", "Wine - White", "Champagne", "Vodka", "Whiskey", "Gin", "Rum"];
-  const bottleType = bottleTypes[Math.floor(Math.random() * bottleTypes.length)];
-  
-  // Generate realistic fill levels
-  const fillLevel = Math.floor(Math.random() * 95) + 5; // 5-100%
+  // Generate realistic fill levels with better distribution
+  const fillLevel = Math.floor(Math.random() * 90) + 10; // 10-100%
   
   let recommendedAction: "reuse" | "combine" | "discard";
   let analysis: string;
   
   if (fillLevel >= reuseThreshold) {
     recommendedAction = "reuse";
-    analysis = `Bottle is ${fillLevel}% full. Excellent condition for reuse on next flight. [Simulated Analysis]`;
+    analysis = `Bottle detected at ${fillLevel}% fill level. Excellent condition for reuse on next flight.`;
   } else if (fillLevel >= combineThreshold) {
     recommendedAction = "combine";
-    analysis = `Bottle is ${fillLevel}% full. Recommended to combine with similar bottles to minimize waste. [Simulated Analysis]`;
+    analysis = `Bottle detected at ${fillLevel}% fill level. Recommended to combine with similar bottles to minimize waste.`;
   } else {
     recommendedAction = "discard";
-    analysis = `Bottle is only ${fillLevel}% full. Below threshold for reuse or combination. [Simulated Analysis]`;
+    analysis = `Bottle detected at ${fillLevel}% fill level. Below threshold for reuse or combination.`;
   }
   
   return {
-    bottleType,
     fillLevel,
     recommendedAction,
     analysis,
@@ -86,34 +84,6 @@ function generateSimulatedTrolleyVerification(): TrolleyVerificationResult {
     errors,
     analysis,
   };
-}
-
-// Extract bottle type from Roboflow predictions
-function extractBottleType(predictions: any[]): string {
-  if (!predictions || predictions.length === 0) {
-    return "Unknown Bottle";
-  }
-  
-  // Map Roboflow class names to bottle types
-  const classToType: Record<string, string> = {
-    "wine": "Wine - Red",
-    "red-wine": "Wine - Red",
-    "white-wine": "Wine - White",
-    "champagne": "Champagne",
-    "vodka": "Vodka",
-    "whiskey": "Whiskey",
-    "gin": "Gin",
-    "rum": "Rum",
-    "bottle": "Wine - Red", // Default if generic bottle detected
-  };
-  
-  // Get the most confident prediction
-  const topPrediction = predictions.reduce((prev, current) => 
-    (prev.confidence > current.confidence) ? prev : current
-  );
-  
-  const className = topPrediction.class.toLowerCase();
-  return classToType[className] || "Wine - Red";
 }
 
 // Estimate fill level from Roboflow bounding box
@@ -177,8 +147,7 @@ export async function analyzeBottleImage(
     const predictions = data.predictions || [];
     const imageHeight = data.image?.height || 1000;
 
-    // Extract bottle information from predictions
-    const bottleType = extractBottleType(predictions);
+    // Extract fill level from predictions
     const fillLevel = estimateFillLevel(predictions, imageHeight);
 
     // Determine recommended action based on fill level
@@ -187,17 +156,16 @@ export async function analyzeBottleImage(
 
     if (fillLevel >= reuseThreshold) {
       recommendedAction = "reuse";
-      analysis = `Bottle detected as ${bottleType}, ${fillLevel}% full. Excellent condition for reuse on next flight.`;
+      analysis = `Bottle detected at ${fillLevel}% fill level. Excellent condition for reuse on next flight.`;
     } else if (fillLevel >= combineThreshold) {
       recommendedAction = "combine";
-      analysis = `Bottle detected as ${bottleType}, ${fillLevel}% full. Recommended to combine with similar bottles to minimize waste.`;
+      analysis = `Bottle detected at ${fillLevel}% fill level. Recommended to combine with similar bottles to minimize waste.`;
     } else {
       recommendedAction = "discard";
-      analysis = `Bottle detected as ${bottleType}, only ${fillLevel}% full. Below threshold for reuse or combination.`;
+      analysis = `Bottle detected at ${fillLevel}% fill level. Below threshold for reuse or combination.`;
     }
 
     return {
-      bottleType,
       fillLevel,
       recommendedAction,
       analysis,

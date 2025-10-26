@@ -192,7 +192,6 @@ export class MemStorage implements IStorage {
       id,
       flightId: insertAnalysis.flightId ?? null,
       imageData: insertAnalysis.imageData ?? null,
-      bottleType: insertAnalysis.bottleType ?? null,
       fillLevel: insertAnalysis.fillLevel ?? null,
       recommendedAction: (insertAnalysis.recommendedAction as "reuse" | "combine" | "discard" | null) ?? null,
       aiAnalysis: insertAnalysis.aiAnalysis ?? null,

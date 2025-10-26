@@ -66,7 +66,6 @@ export const bottleAnalyses = pgTable("bottle_analyses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   flightId: varchar("flight_id").references(() => flights.id),
   imageData: text("image_data"), // base64 encoded
-  bottleType: text("bottle_type"),
   fillLevel: integer("fill_level"), // percentage 0-100
   recommendedAction: text("recommended_action").$type<BottleAction>(),
   aiAnalysis: text("ai_analysis"), // raw AI response
@@ -140,7 +139,6 @@ export interface TrendData {
 
 // API response types
 export interface BottleAnalysisResult {
-  bottleType: string;
   fillLevel: number;
   recommendedAction: BottleAction;
   analysis: string;

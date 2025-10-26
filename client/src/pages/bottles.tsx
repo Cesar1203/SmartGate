@@ -263,10 +263,6 @@ export default function Bottles() {
               <div className="space-y-4">
                 <img src={capturedImage!} alt="Analyzed bottle" className="w-full rounded-md" />
                 <div className="p-4 rounded-md border space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Bottle Type</span>
-                    <span className="text-sm">{analysisResult.bottleType || "Unknown"}</span>
-                  </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium">Fill Level</span>
@@ -313,14 +309,13 @@ export default function Bottles() {
                       <Wine className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <p className="text-sm font-medium truncate">{analysis.bottleType || "Unknown Type"}</p>
+                          <p className="text-sm font-medium">Fill Level: {analysis.fillLevel}%</p>
                           <Badge size="sm" className={`gap-1 flex-shrink-0 ${getActionColor(analysis.recommendedAction!)}`}>
                             {getActionIcon(analysis.recommendedAction!)}
                             {analysis.recommendedAction}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span>Fill: {analysis.fillLevel}%</span>
                           <span>{new Date(analysis.timestamp).toLocaleTimeString()}</span>
                         </div>
                       </div>

@@ -146,14 +146,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reuseThreshold = airlineRule?.reuseThreshold || 70;
       const combineThreshold = airlineRule?.combineThreshold || 40;
 
-      // Analyze the image using OpenAI Vision
+      // Analyze the image using Roboflow
       const result = await analyzeBottleImage(imageData, reuseThreshold, combineThreshold);
 
       // Store the analysis
       const analysis = await storage.createBottleAnalysis({
         flightId,
         imageData,
-        bottleType: result.bottleType,
         fillLevel: result.fillLevel,
         recommendedAction: result.recommendedAction,
         aiAnalysis: result.analysis,
