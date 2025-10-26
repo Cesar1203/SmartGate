@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage, extractAirlineCode } from "./storage";
 import { insertFlightSchema, insertAirlineRuleSchema, insertOrderSchema, insertReassignmentSchema } from "@shared/schema";
-import { analyzeBottleImage, verifyTrolleyImage } from "./openai";
+import { analyzeBottleImage, verifyTrolleyImage } from "./roboflow";
 import { getWeatherData, calculateFlightReliability, getReliabilityRecommendation } from "./weather";
 
 export async function registerRoutes(app: Express): Promise<Server> {
