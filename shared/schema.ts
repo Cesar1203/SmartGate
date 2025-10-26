@@ -85,11 +85,13 @@ export type BottleAnalysis = typeof bottleAnalyses.$inferSelect;
 export const trolleyVerifications = pgTable("trolley_verifications", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   flightId: varchar("flight_id").references(() => flights.id),
+  trolleyId: text("trolley_id"), // TR001, TR002, etc.
   imageData: text("image_data"), // base64 encoded
   goldenLayoutName: text("golden_layout_name"),
   hasErrors: integer("has_errors").notNull().default(0), // 0 or 1 (boolean)
   errors: jsonb("errors").$type<string[]>(), // array of error descriptions
   aiAnalysis: text("ai_analysis"), // raw AI response
+  verifiedBy: text("verified_by"), // Employee who performed the verification
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
 
@@ -229,6 +231,10 @@ export const orders = pgTable("orders", {
   snacksRequested: integer("snacks_requested").notNull().default(0),
   beveragesRequested: integer("beverages_requested").notNull().default(0),
   status: text("status").notNull().$type<OrderStatus>().default("pending"),
+  trolleyId: text("trolley_id"), // TR001, TR002, etc.
+  startTime: timestamp("start_time"), // When order preparation started
+  completionTime: timestamp("completion_time"), // When order was completed
+  completedBy: text("completed_by"), // Employee who completed the order
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
 
