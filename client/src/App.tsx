@@ -14,6 +14,7 @@ import Trolleys from "@/pages/trolleys";
 import Replanning from "@/pages/replanning";
 import Rules from "@/pages/rules";
 import Orders from "@/pages/orders";
+import Employees from "@/pages/employees";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/replanning" component={Replanning} />
       <Route path="/rules" component={Rules} />
       <Route path="/orders" component={Orders} />
+      <Route path="/employees" component={Employees} />
       <Route component={NotFound} />
     </Switch>
   );

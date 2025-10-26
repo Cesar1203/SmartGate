@@ -180,68 +180,7 @@ export async function analyzeBottleImage(
 }
 
 export async function verifyTrolleyImage(base64Image: string): Promise<TrolleyVerificationResult> {
-  try {
-    if (!ROBOFLOW_API_KEY) {
-      console.log("Roboflow API key not configured - using simulated verification");
-      return generateSimulatedTrolleyVerification();
-    }
-
-    // Extract base64 data
-    const base64Data = base64Image.includes(',') 
-      ? base64Image.split(',')[1] 
-      : base64Image;
-
-    // Make request to Roboflow inference API using native fetch
-    const url = new URL(`${ROBOFLOW_API_URL}/${TROLLEY_MODEL_ID}`);
-    url.searchParams.append('api_key', ROBOFLOW_API_KEY);
-    url.searchParams.append('confidence', '40');
-    url.searchParams.append('overlap', '30');
-
-    const response = await fetch(url.toString(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: base64Data,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Roboflow API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const predictions = data.predictions || [];
-
-    // Analyze predictions to detect errors
-    const errors: string[] = [];
-    const expectedItems = ["beverage", "meal", "cutlery", "snack"];
-    
-    // Check for missing or misplaced items based on predictions
-    if (predictions.length < 5) {
-      errors.push("Missing items detected - fewer items than expected");
-    }
-
-    // Check for low-confidence detections (possible misplacements)
-    const lowConfidencePredictions = predictions.filter((p: any) => p.confidence < 0.6);
-    if (lowConfidencePredictions.length > 0) {
-      errors.push(`${lowConfidencePredictions.length} item(s) in incorrect position`);
-    }
-
-    const hasErrors = errors.length > 0;
-    const analysis = hasErrors
-      ? `Trolley verification identified ${errors.length} discrepanc${errors.length === 1 ? 'y' : 'ies'}. Please review and correct before service.`
-      : `All items correctly positioned. Trolley configuration verified successfully with ${predictions.length} items detected.`;
-
-    return {
-      hasErrors,
-      errors,
-      analysis,
-    };
-  } catch (error: any) {
-    console.error("Roboflow trolley verification error:", error.message);
-    
-    // Use simulated verification when Roboflow fails
-    console.log("Roboflow API unavailable - using simulated verification for demo");
-    return generateSimulatedTrolleyVerification();
-  }
+  // Trolley verification ALWAYS uses simulated demo data (no Roboflow integration)
+  console.log("Trolley verification using simulated demo data");
+  return generateSimulatedTrolleyVerification();
 }

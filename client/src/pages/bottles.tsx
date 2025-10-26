@@ -35,12 +35,13 @@ export default function Bottles() {
       return await apiRequest("POST", "/api/bottles/analyze", data);
     },
     onSuccess: (result: BottleAnalysis) => {
+      console.log("Analysis result:", result);
       setAnalysisResult(result);
       queryClient.invalidateQueries({ queryKey: ["/api/bottles/recent"] });
       queryClient.invalidateQueries({ queryKey: ["/api/metrics"] });
       toast({
         title: "Analysis complete",
-        description: "Bottle has been analyzed successfully.",
+        description: `Bottle analyzed: ${result.fillLevel}% full`,
       });
     },
     onError: (error: Error) => {

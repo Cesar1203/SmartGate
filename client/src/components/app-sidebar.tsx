@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plane, Wine, ClipboardCheck, Settings, Calendar, ShoppingCart } from "lucide-react";
+import { LayoutDashboard, Plane, Wine, ClipboardCheck, Settings, Calendar, ShoppingCart, Users } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
   Sidebar,
@@ -38,6 +38,11 @@ const menuItems = [
     title: "Trolley Verification",
     url: "/trolleys",
     icon: ClipboardCheck,
+  },
+  {
+    title: "Employee Performance",
+    url: "/employees",
+    icon: Users,
   },
   {
     title: "Replanning",

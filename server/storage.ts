@@ -83,6 +83,8 @@ export interface IStorage {
   getEfficiencyTrend(): Promise<TrendData[]>;
   getFoodSavedTrend(): Promise<TrendData[]>;
   getEmployeeMetrics(): Promise<EmployeeMetric[]>;
+  addEmployeeMetric(metric: EmployeeMetric): Promise<EmployeeMetric>;
+  updateEmployeeMetric(employeeName: string, metric: Partial<EmployeeMetric>): Promise<EmployeeMetric | undefined>;
 
   // Demo mode
   loadDemoData(): Promise<void>;
@@ -96,6 +98,7 @@ export class MemStorage implements IStorage {
   private trolleyVerifications: TrolleyVerification[];
   private orders: Map<string, Order>;
   private reassignments: Reassignment[];
+  private employeeMetrics: EmployeeMetric[];
 
   constructor() {
     this.flights = new Map();
@@ -104,6 +107,7 @@ export class MemStorage implements IStorage {
     this.trolleyVerifications = [];
     this.orders = new Map();
     this.reassignments = [];
+    this.employeeMetrics = [];
   }
 
   // Flight operations
@@ -379,9 +383,28 @@ export class MemStorage implements IStorage {
   }
 
   async getEmployeeMetrics(): Promise<EmployeeMetric[]> {
-    // Return demo employee metrics
+    // Return user-created metrics, or demo data if none exist
+    if (this.employeeMetrics.length > 0) {
+      return [...this.employeeMetrics];
+    }
     const { demoEmployeeMetrics } = await import("@shared/demo-data");
     return demoEmployeeMetrics;
+  }
+
+  async addEmployeeMetric(metric: EmployeeMetric): Promise<EmployeeMetric> {
+    this.employeeMetrics.push(metric);
+    return metric;
+  }
+
+  async updateEmployeeMetric(employeeName: string, metric: Partial<EmployeeMetric>): Promise<EmployeeMetric | undefined> {
+    const index = this.employeeMetrics.findIndex(m => m.employeeName === employeeName);
+    if (index === -1) return undefined;
+    
+    this.employeeMetrics[index] = {
+      ...this.employeeMetrics[index],
+      ...metric,
+    };
+    return this.employeeMetrics[index];
   }
 
   async loadDemoData(): Promise<void> {
@@ -437,6 +460,7 @@ export class MemStorage implements IStorage {
     this.trolleyVerifications = [];
     this.orders.clear();
     this.reassignments = [];
+    this.employeeMetrics = [];
   }
 }
 

@@ -130,6 +130,26 @@ export interface EmployeeMetric {
   trolleysProcessed: number;
 }
 
+// Employee metric validation schemas
+export const insertEmployeeMetricSchema = z.object({
+  employeeName: z.string().min(1, "Employee name is required"),
+  avgPrepTime: z.coerce.number().positive("Average prep time must be positive"),
+  errorRate: z.coerce.number().min(0, "Error rate must be non-negative").max(100, "Error rate cannot exceed 100%"),
+  complianceRate: z.coerce.number().min(0, "Compliance rate must be non-negative").max(100, "Compliance rate cannot exceed 100%"),
+  trolleysProcessed: z.coerce.number().int("Trolleys processed must be a whole number").nonnegative("Trolleys processed must be non-negative"),
+});
+
+export const updateEmployeeMetricSchema = insertEmployeeMetricSchema
+  .partial()
+  .omit({ employeeName: true })
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    { message: "At least one field must be provided for update" }
+  );
+
+export type InsertEmployeeMetric = z.infer<typeof insertEmployeeMetricSchema>;
+export type UpdateEmployeeMetric = z.infer<typeof updateEmployeeMetricSchema>;
+
 // Chart data for trends
 export interface TrendData {
   date: string;

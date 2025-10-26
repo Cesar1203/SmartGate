@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage, extractAirlineCode } from "./storage";
-import { insertFlightSchema, insertAirlineRuleSchema, insertOrderSchema, insertReassignmentSchema } from "@shared/schema";
+import { insertFlightSchema, insertAirlineRuleSchema, insertOrderSchema, insertReassignmentSchema, insertEmployeeMetricSchema, updateEmployeeMetricSchema } from "@shared/schema";
 import { analyzeBottleImage, verifyTrolleyImage } from "./roboflow";
 import { getWeatherData, calculateFlightReliability, getReliabilityRecommendation } from "./weather";
 
@@ -242,6 +242,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(employees);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch employee metrics" });
+    }
+  });
+
+  app.post("/api/metrics/employees", async (req, res) => {
+    try {
+      const validated = insertEmployeeMetricSchema.parse(req.body);
+      const metric = await storage.addEmployeeMetric(validated);
+      res.status(201).json(metric);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          error: "Invalid employee metric data", 
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: error.message || "Failed to add employee metric" });
+    }
+  });
+
+  app.patch("/api/metrics/employees/:employeeName", async (req, res) => {
+    try {
+      const { employeeName } = req.params;
+      const validated = updateEmployeeMetricSchema.parse(req.body);
+
+      const updated = await storage.updateEmployeeMetric(employeeName, validated);
+      if (!updated) {
+        return res.status(404).json({ error: "Employee not found" });
+      }
+
+      res.json(updated);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          error: "Invalid employee metric data", 
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: error.message || "Failed to update employee metric" });
     }
   });
 
