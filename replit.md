@@ -1,21 +1,23 @@
-# SmartCater - Intelligent Airline Catering Operations Platform
+# SmartGate - Intelligent Airline Catering Operations Platform
 
 ## Overview
 
-SmartCater is an enterprise operations platform designed for GateGroup to optimize airline catering operations through AI-powered smart execution. The system focuses on four core modules: automated bottle handling with computer vision, real-time trolley verification, flight reliability prediction based on weather data, and dynamic resource replanning. Built as a mission-critical tool, it prioritizes operational efficiency, high information density, and real-time decision support for catering staff managing flight preparations.
+SmartGate is an enterprise operations platform designed for GateGroup to optimize airline catering operations through AI-powered smart execution. The system focuses on four core modules: automated bottle handling with computer vision, real-time trolley verification with employee tracking, flight reliability prediction based on weather data, and dynamic resource replanning. Built as a mission-critical tool for HackMTY 2025, it prioritizes operational efficiency, high information density, and real-time decision support for catering staff managing flight preparations.
 
 ## Enhanced Demo Mode
 
-SmartCater includes a comprehensive demo mode with rich sample data for demonstration and testing purposes:
+SmartGate includes a comprehensive demo mode with rich sample data for demonstration and testing purposes:
 
 **Demo Data Coverage**:
-- **17 Flights** across 6 international airlines:
+- **21 Flights** across 8 international airlines including Mexican carriers:
   - AeroMexico (AM): 4 flights with mix of scheduled/delayed status
   - American Airlines (AA): 3 flights including delayed scenarios
   - Delta (DL): 3 flights with cancelled example
   - United (UA): 3 flights including delayed scenario
   - Lufthansa (LH): 2 long-haul European flights
   - Air France (AF): 2 European destination flights
+  - Volaris (Y4): 2 flights to Mexican beach destinations (Tijuana, Cancún)
+  - VivaAerobus (VB): 2 flights to Mexican resort cities (Puerto Vallarta, Los Cabos)
 - **12 Bottle Analyses** covering diverse beverage types:
   - Wine varieties (Red, White, Rosé), Champagne, Prosecco
   - Spirits: Vodka, Gin, Rum, Whiskey, Bourbon, Cognac, Tequila
@@ -25,8 +27,9 @@ SmartCater includes a comprehensive demo mode with rich sample data for demonstr
   - Multiple cabin classes: Economy, Premium Economy, Business, First Class
   - Mix of successful verifications (no errors) and failed (with detailed error lists)
   - Various error types: missing items, incorrect positioning, inventory mismatches
-- **6 Airline Rules** with different operational thresholds:
+- **8 Airline Rules** with different operational thresholds:
   - Custom reuse and combine thresholds per airline (ranging from 65-80% for reuse)
+  - Includes rules for Mexican carriers Volaris and VivaAerobus
 - **8 Employee Performance Metrics**:
   - Diverse team with varied efficiency scores, error rates, and compliance rates
   - Average prep times ranging from 11.2 to 14.2 minutes
@@ -93,11 +96,22 @@ Preferred communication style: Simple, everyday language.
 - Metrics aggregation endpoints for dashboard data
 
 **AI Integration Strategy**
-- Roboflow API for computer vision-based image analysis (replaced OpenAI)
+- OpenAI Vision API (GPT-5) for computer vision-based image analysis
 - Bottle analysis: Object detection on base64 images to detect bottle type and estimate fill level
 - Trolley verification: Item detection to validate trolley layout against expected configuration
 - Configurable thresholds per airline for business rule enforcement
 - Fallback to simulated analysis when API is unavailable for uninterrupted demo functionality
+
+**Order Workflow with Employee Tracking**
+- Timer-based order preparation tracking from start to completion
+- Automatic trolley ID generation (TR001, TR002, etc.) when order starts
+- Employee name capture for both order completion and trolley verification
+- API endpoints:
+  - `POST /api/orders/:id/start` - Starts timer and assigns trolley ID
+  - `POST /api/orders/:id/complete` - Completes order with employee name, requires startTime
+  - `POST /api/orders/:id/verify` - Verifies trolley with employee name, creates verification record
+- Real-time timer display showing minutes elapsed during order preparation
+- Employee performance metrics calculated from completion times and verification errors
 
 ### Data Storage Solutions
 
