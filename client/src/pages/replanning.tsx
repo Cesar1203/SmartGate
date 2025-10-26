@@ -23,19 +23,57 @@ export default function Replanning() {
   const processReassignmentsMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/reassignments/process");
-      return res as { reassignments: Reassignment[]; processed: number };
+      return res.json() as Promise<{ reassignments: Reassignment[]; processed: number }>;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/reassignments"] });
       toast({
-        title: "Reasignaciones procesadas",
-        description: `Se procesaron ${data.processed} vuelos afectados`,
+        title: "Reassignments processed",
+        description: `Processed ${data.processed} affected flights`,
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "No se pudieron procesar las reasignaciones",
+        description: "Failed to process reassignments",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const reassignToOrderMutation = useMutation({
+    mutationFn: async ({ fromFlight, toFlight }: { fromFlight: Flight; toFlight: Flight }) => {
+      // Create pending order for the target flight with reassigned resources
+      const orderData = {
+        flightNumber: toFlight.flightNumber,
+        airline: toFlight.airline,
+        destination: toFlight.destination,
+        departureTime: toFlight.departureTime,
+        mealsRequested: fromFlight.plannedMeals || 0,
+        snacksRequested: 0,
+        beveragesRequested: fromFlight.plannedBottles || 0,
+        status: "pending",
+      };
+      
+      const res = await apiRequest("POST", "/api/orders", orderData);
+      
+      // Update the delayed flight status to 'reassigned' so it doesn't show in replanning anymore
+      await apiRequest("PATCH", `/api/flights/${fromFlight.id}`, { status: "reassigned" });
+      
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/flights"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders/pending"] });
+      toast({
+        title: "Reassignment successful",
+        description: "Resources moved to pending orders",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to create reassignment order",
         variant: "destructive",
       });
     },
@@ -43,6 +81,21 @@ export default function Replanning() {
 
   const delayedFlights = flights?.filter((f) => f.status === "delayed" || f.status === "cancelled") || [];
   const scheduledFlights = flights?.filter((f) => f.status === "scheduled") || [];
+
+  // Extract airline code from flight number
+  const extractAirlineCode = (flightNumber: string): string => {
+    const match = flightNumber.match(/^([A-Z]{2,3})/);
+    return match ? match[1] : "";
+  };
+
+  // Get compatible flights for a delayed flight (same airline only)
+  const getCompatibleFlights = (delayedFlight: Flight): Flight[] => {
+    const delayedAirlineCode = extractAirlineCode(delayedFlight.flightNumber);
+    return scheduledFlights.filter((f) => {
+      const flightAirlineCode = extractAirlineCode(f.flightNumber);
+      return flightAirlineCode === delayedAirlineCode;
+    });
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -131,30 +184,48 @@ export default function Replanning() {
                         </ul>
                       </div>
 
-                      {scheduledFlights.length > 0 && (
-                        <div className="pt-2 border-t">
-                          <p className="text-sm font-medium mb-2">Suggested Reassignments:</p>
-                          <div className="space-y-2">
-                            {scheduledFlights.slice(0, 2).map((targetFlight) => (
-                              <div
-                                key={targetFlight.id}
-                                className="flex items-center justify-between p-2 rounded-md bg-background/50"
-                              >
-                                <div className="flex items-center gap-2 text-sm">
-                                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                                  <span className="font-mono font-medium">{targetFlight.flightNumber}</span>
-                                  <span className="text-muted-foreground">
-                                    {format(new Date(targetFlight.departureTime), "HH:mm")}
-                                  </span>
+                      {(() => {
+                        const compatibleFlights = getCompatibleFlights(flight);
+                        return compatibleFlights.length > 0 ? (
+                          <div className="pt-2 border-t">
+                            <p className="text-sm font-medium mb-2">Suggested Reassignments:</p>
+                            <div className="space-y-2">
+                              {compatibleFlights.slice(0, 2).map((targetFlight) => (
+                                <div
+                                  key={targetFlight.id}
+                                  className="flex items-center justify-between p-2 rounded-md bg-background/50"
+                                >
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                                    <span className="font-mono font-medium">{targetFlight.flightNumber}</span>
+                                    <span className="text-muted-foreground">
+                                      {format(new Date(targetFlight.departureTime), "HH:mm")}
+                                    </span>
+                                  </div>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    onClick={() => reassignToOrderMutation.mutate({ fromFlight: flight, toFlight: targetFlight })}
+                                    disabled={reassignToOrderMutation.isPending}
+                                    data-testid={`button-reassign-${targetFlight.id}`}
+                                  >
+                                    {reassignToOrderMutation.isPending ? "Processing..." : "Reassign"}
+                                  </Button>
                                 </div>
-                                <Button size="sm" variant="outline" data-testid={`button-reassign-${targetFlight.id}`}>
-                                  Reassign
-                                </Button>
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        ) : (
+                          <div className="pt-2 border-t">
+                            <p className="text-sm font-medium mb-2 text-yellow-600 dark:text-yellow-400">
+                              ⚠️ No compatible same-airline flights available
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Food can only be reassigned to flights of the same airline
+                            </p>
+                          </div>
+                        );
+                      })()}
                     </div>
                   ))}
                 </CardContent>

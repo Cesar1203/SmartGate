@@ -62,14 +62,14 @@ export default function Orders() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders/pending"] });
       form.reset();
       toast({
-        title: "Pedido creado",
-        description: "El pedido ha sido creado exitosamente",
+        title: "Order created",
+        description: "The order has been created successfully",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "No se pudo crear el pedido",
+        description: "Failed to create order",
         variant: "destructive",
       });
     },
@@ -84,14 +84,14 @@ export default function Orders() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders/pending"] });
       setVerifyingOrder(order);
       toast({
-        title: "Pedido completado",
-        description: "El pedido está listo para verificación de trolley",
+        title: "Order completed",
+        description: "The order is ready for trolley verification",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "No se pudo completar el pedido",
+        description: "Failed to complete order",
         variant: "destructive",
       });
     },
@@ -106,14 +106,14 @@ export default function Orders() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders/pending"] });
       setVerifyingOrder(null);
       toast({
-        title: "Trolley verificado",
-        description: "El pedido ha sido verificado exitosamente",
+        title: "Trolley verified",
+        description: "The order has been verified successfully",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "No se pudo verificar el pedido",
+        description: "Failed to verify order",
         variant: "destructive",
       });
     },
@@ -128,15 +128,15 @@ export default function Orders() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders/pending"] });
       setVerifyingOrder(null);
       toast({
-        title: "Pedido cancelado",
-        description: "El pedido ha sido cancelado",
+        title: "Order cancelled",
+        description: "The order has been cancelled",
         variant: "destructive",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "No se pudo cancelar el pedido",
+        description: "Failed to cancel order",
         variant: "destructive",
       });
     },
@@ -149,13 +149,13 @@ export default function Orders() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge variant="secondary" data-testid="badge-status-pending">Pendiente</Badge>;
+        return <Badge variant="secondary" data-testid="badge-status-pending">Pending</Badge>;
       case "in_verification":
-        return <Badge className="bg-blue-500 hover:bg-blue-600" data-testid="badge-status-verification">En Verificación</Badge>;
+        return <Badge className="bg-blue-500 hover:bg-blue-600" data-testid="badge-status-verification">In Verification</Badge>;
       case "completed":
-        return <Badge variant="default" data-testid="badge-status-completed">Completado</Badge>;
+        return <Badge variant="default" data-testid="badge-status-completed">Completed</Badge>;
       case "cancelled":
-        return <Badge variant="destructive" data-testid="badge-status-cancelled">Cancelado</Badge>;
+        return <Badge variant="destructive" data-testid="badge-status-cancelled">Cancelled</Badge>;
       default:
         return <Badge variant="outline" data-testid="badge-status-unknown">{status}</Badge>;
     }
@@ -165,17 +165,17 @@ export default function Orders() {
     <div className="flex h-full gap-4">
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pedidos de Clientes</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Customer Orders</h1>
           <p className="text-muted-foreground mt-2">
-            Gestiona los pedidos de clientes y verifica trolleys
+            Manage customer orders and verify trolleys
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Crear Nuevo Pedido</CardTitle>
+            <CardTitle>Create New Order</CardTitle>
             <CardDescription>
-              Ingresa los detalles del pedido del cliente
+              Enter customer order details
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -187,7 +187,7 @@ export default function Orders() {
                     name="flightNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Número de Vuelo</FormLabel>
+                        <FormLabel>Flight Number</FormLabel>
                         <FormControl>
                           <Input placeholder="AA1234" {...field} data-testid="input-flight-number" />
                         </FormControl>
@@ -200,11 +200,11 @@ export default function Orders() {
                     name="airline"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Aerolínea</FormLabel>
+                        <FormLabel>Airline</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-airline">
-                              <SelectValue placeholder="Seleccionar" />
+                              <SelectValue placeholder="Select" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -227,9 +227,9 @@ export default function Orders() {
                     name="destination"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Destino</FormLabel>
+                        <FormLabel>Destination</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ciudad" {...field} data-testid="input-destination" />
+                          <Input placeholder="City" {...field} data-testid="input-destination" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -240,7 +240,7 @@ export default function Orders() {
                     name="departureTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Hora de Salida</FormLabel>
+                        <FormLabel>Departure Time</FormLabel>
                         <FormControl>
                           <Input
                             type="datetime-local"
@@ -270,7 +270,7 @@ export default function Orders() {
                     name="mealsRequested"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Comidas</FormLabel>
+                        <FormLabel>Meals</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -308,7 +308,7 @@ export default function Orders() {
                     name="beveragesRequested"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Bebidas</FormLabel>
+                        <FormLabel>Beverages</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -329,7 +329,7 @@ export default function Orders() {
                   disabled={createOrderMutation.isPending}
                   data-testid="button-create-order"
                 >
-                  {createOrderMutation.isPending ? "Creando..." : "Crear Pedido"}
+                  {createOrderMutation.isPending ? "Creating..." : "Create Order"}
                 </Button>
               </form>
             </Form>
@@ -340,19 +340,19 @@ export default function Orders() {
       <div className="w-96 border-l bg-muted/30 overflow-y-auto p-6">
         <div className="space-y-4">
           <div>
-            <h2 className="text-xl font-bold">Pedidos Pendientes</h2>
+            <h2 className="text-xl font-bold">Pending Orders</h2>
             <p className="text-sm text-muted-foreground">
-              {pendingOrders.length} pedido{pendingOrders.length !== 1 ? "s" : ""}
+              {pendingOrders.length} order{pendingOrders.length !== 1 ? "s" : ""}
             </p>
           </div>
 
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">
-              Cargando pedidos...
+              Loading orders...
             </div>
           ) : pendingOrders.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No hay pedidos pendientes
+              No pending orders
             </div>
           ) : (
             <div className="space-y-3">
@@ -383,7 +383,7 @@ export default function Orders() {
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Package className="h-3 w-3" />
                           <span>
-                            {order.mealsRequested} comidas, {order.snacksRequested} snacks, {order.beveragesRequested} bebidas
+                            {order.mealsRequested} meals, {order.snacksRequested} snacks, {order.beveragesRequested} beverages
                           </span>
                         </div>
                       </div>
@@ -396,7 +396,7 @@ export default function Orders() {
                           disabled={completeOrderMutation.isPending}
                           data-testid={`button-complete-${order.id}`}
                         >
-                          {completeOrderMutation.isPending ? "Procesando..." : "Completar Pedido"}
+                          {completeOrderMutation.isPending ? "Processing..." : "Complete Order"}
                         </Button>
                       )}
 
@@ -407,7 +407,7 @@ export default function Orders() {
                           onClick={() => setVerifyingOrder(order)}
                           data-testid={`button-verify-${order.id}`}
                         >
-                          Verificar Trolley
+                          Verify Trolley
                         </Button>
                       )}
                     </div>
@@ -422,9 +422,9 @@ export default function Orders() {
       <Dialog open={!!verifyingOrder} onOpenChange={(open) => !open && setVerifyingOrder(null)}>
         <DialogContent data-testid="dialog-verify-trolley">
           <DialogHeader>
-            <DialogTitle>Verificación de Trolley</DialogTitle>
+            <DialogTitle>Trolley Verification</DialogTitle>
             <DialogDescription>
-              Confirma que el trolley para este pedido está correctamente preparado
+              Confirm that the trolley for this order is correctly prepared
             </DialogDescription>
           </DialogHeader>
 
@@ -432,24 +432,24 @@ export default function Orders() {
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium">Vuelo:</span>
+                  <span className="text-sm font-medium">Flight:</span>
                   <span className="text-sm font-mono" data-testid="verify-flight-number">{verifyingOrder.flightNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium">Aerolínea:</span>
+                  <span className="text-sm font-medium">Airline:</span>
                   <span className="text-sm" data-testid="verify-airline">{verifyingOrder.airline}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium">Destino:</span>
+                  <span className="text-sm font-medium">Destination:</span>
                   <span className="text-sm" data-testid="verify-destination">{verifyingOrder.destination}</span>
                 </div>
               </div>
 
               <div className="border-t pt-4">
-                <p className="text-sm font-medium mb-2">Productos Solicitados:</p>
+                <p className="text-sm font-medium mb-2">Requested Products:</p>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Comidas:</span>
+                    <span className="text-muted-foreground">Meals:</span>
                     <span data-testid="verify-meals">{verifyingOrder.mealsRequested}</span>
                   </div>
                   <div className="flex justify-between">
@@ -457,7 +457,7 @@ export default function Orders() {
                     <span data-testid="verify-snacks">{verifyingOrder.snacksRequested}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Bebidas:</span>
+                    <span className="text-muted-foreground">Beverages:</span>
                     <span data-testid="verify-beverages">{verifyingOrder.beveragesRequested}</span>
                   </div>
                 </div>
@@ -473,7 +473,7 @@ export default function Orders() {
               data-testid="button-cancel-order"
             >
               <XCircle className="h-4 w-4 mr-2" />
-              Cancelar
+              Cancel
             </Button>
             <Button
               onClick={() => verifyingOrder && verifyOrderMutation.mutate(verifyingOrder.id)}
@@ -481,7 +481,7 @@ export default function Orders() {
               data-testid="button-verify-order"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
-              Verificado ✅
+              Verified ✅
             </Button>
           </DialogFooter>
         </DialogContent>

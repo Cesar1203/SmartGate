@@ -8,6 +8,7 @@ export const FlightStatus = {
   SCHEDULED: "scheduled",
   DELAYED: "delayed",
   CANCELLED: "cancelled",
+  REASSIGNED: "reassigned",
 } as const;
 
 export type FlightStatus = typeof FlightStatus[keyof typeof FlightStatus];
