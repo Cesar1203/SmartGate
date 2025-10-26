@@ -15,6 +15,12 @@ export interface TrolleyVerificationResult {
 const ROBOFLOW_API_KEY = process.env.ROBOFLOW_API_KEY;
 const ROBOFLOW_API_URL = "https://detect.roboflow.com";
 
+// Roboflow model configuration
+// Replace these with your actual Roboflow project and model IDs
+// Format: "project-name/version" (e.g., "my-bottle-model/1")
+const BOTTLE_MODEL_ID = process.env.ROBOFLOW_BOTTLE_MODEL || "bottle-detection/1";
+const TROLLEY_MODEL_ID = process.env.ROBOFLOW_TROLLEY_MODEL || "trolley-verification/1";
+
 // Simulated analysis for demo mode when Roboflow is not available
 function generateSimulatedBottleAnalysis(
   reuseThreshold: number,
@@ -150,8 +156,7 @@ export async function analyzeBottleImage(
       : base64Image;
 
     // Make request to Roboflow inference API using native fetch
-    // Using a generic object detection model for demo purposes
-    const url = new URL(`${ROBOFLOW_API_URL}/bottle-detection/1`);
+    const url = new URL(`${ROBOFLOW_API_URL}/${BOTTLE_MODEL_ID}`);
     url.searchParams.append('api_key', ROBOFLOW_API_KEY);
     url.searchParams.append('confidence', '40');
     url.searchParams.append('overlap', '30');
@@ -219,8 +224,7 @@ export async function verifyTrolleyImage(base64Image: string): Promise<TrolleyVe
       : base64Image;
 
     // Make request to Roboflow inference API using native fetch
-    // Using a generic object detection model for trolley verification
-    const url = new URL(`${ROBOFLOW_API_URL}/trolley-verification/1`);
+    const url = new URL(`${ROBOFLOW_API_URL}/${TROLLEY_MODEL_ID}`);
     url.searchParams.append('api_key', ROBOFLOW_API_KEY);
     url.searchParams.append('confidence', '40');
     url.searchParams.append('overlap', '30');
