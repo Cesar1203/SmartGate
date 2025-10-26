@@ -29,6 +29,9 @@ import {
 export default function Orders() {
   const { toast } = useToast();
   const [verifyingOrder, setVerifyingOrder] = useState<Order | null>(null);
+  const [completingOrder, setCompletingOrder] = useState<Order | null>(null);
+  const [employeeName, setEmployeeName] = useState("");
+  const [verifierName, setVerifierName] = useState("");
 
   const { data: pendingOrders = [], isLoading } = useQuery<Order[]>({
     queryKey: ["/api/orders/pending"],
@@ -75,13 +78,36 @@ export default function Orders() {
     },
   });
 
-  const completeOrderMutation = useMutation({
+  const startOrderMutation = useMutation({
     mutationFn: async (orderId: string) => {
-      const res = await apiRequest("POST", `/api/orders/${orderId}/complete`, {});
+      const res = await apiRequest("POST", `/api/orders/${orderId}/start`, {});
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/orders/pending"] });
+      toast({
+        title: "Order started",
+        description: "Timer started for this order",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to start order",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const completeOrderMutation = useMutation({
+    mutationFn: async ({ orderId, completedBy }: { orderId: string; completedBy: string }) => {
+      const res = await apiRequest("POST", `/api/orders/${orderId}/complete`, { completedBy });
       return res.json();
     },
     onSuccess: (order: Order) => {
       queryClient.invalidateQueries({ queryKey: ["/api/orders/pending"] });
+      setCompletingOrder(null);
+      setEmployeeName("");
       setVerifyingOrder(order);
       toast({
         title: "Order completed",
@@ -98,13 +124,16 @@ export default function Orders() {
   });
 
   const verifyOrderMutation = useMutation({
-    mutationFn: async (orderId: string) => {
-      const res = await apiRequest("POST", `/api/orders/${orderId}/verify`, {});
+    mutationFn: async ({ orderId, verifiedBy }: { orderId: string; verifiedBy: string }) => {
+      const res = await apiRequest("POST", `/api/orders/${orderId}/verify`, { verifiedBy });
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/orders/pending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/metrics"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/metrics/employees"] });
       setVerifyingOrder(null);
+      setVerifierName("");
       toast({
         title: "Trolley verified",
         description: "The order has been verified successfully",
@@ -388,15 +417,40 @@ export default function Orders() {
                         </div>
                       </div>
 
-                      {order.status === "pending" && (
+                      {order.trolleyId && (
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Package className="h-3 w-3" />
+                          Trolley ID: <span className="font-mono font-semibold">{order.trolleyId}</span>
+                        </div>
+                      )}
+
+                      {order.startTime && !order.completionTime && (
+                        <div className="text-xs text-primary flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          In Progress: {Math.floor((Date.now() - new Date(order.startTime).getTime()) / 1000 / 60)} min
+                        </div>
+                      )}
+
+                      {order.status === "pending" && !order.startTime && (
                         <Button
                           className="w-full"
                           size="sm"
-                          onClick={() => completeOrderMutation.mutate(order.id)}
-                          disabled={completeOrderMutation.isPending}
+                          onClick={() => startOrderMutation.mutate(order.id)}
+                          disabled={startOrderMutation.isPending}
+                          data-testid={`button-start-${order.id}`}
+                        >
+                          {startOrderMutation.isPending ? "Starting..." : "Start Order"}
+                        </Button>
+                      )}
+
+                      {order.status === "pending" && order.startTime && !order.completionTime && (
+                        <Button
+                          className="w-full"
+                          size="sm"
+                          onClick={() => setCompletingOrder(order)}
                           data-testid={`button-complete-${order.id}`}
                         >
-                          {completeOrderMutation.isPending ? "Processing..." : "Complete Order"}
+                          Complete Order
                         </Button>
                       )}
 
@@ -462,26 +516,96 @@ export default function Orders() {
                   </div>
                 </div>
               </div>
+
+              <div className="border-t pt-4">
+                <label className="text-sm font-medium mb-2 block">Verified By (Employee Name)</label>
+                <Input
+                  value={verifierName}
+                  onChange={(e) => setVerifierName(e.target.value)}
+                  placeholder="Enter your name"
+                  data-testid="input-verifier-name"
+                />
+              </div>
             </div>
           )}
 
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => verifyingOrder && cancelOrderMutation.mutate(verifyingOrder.id)}
-              disabled={cancelOrderMutation.isPending}
-              data-testid="button-cancel-order"
+              onClick={() => {
+                setVerifyingOrder(null);
+                setVerifierName("");
+              }}
+              data-testid="button-cancel-verify"
             >
               <XCircle className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button
-              onClick={() => verifyingOrder && verifyOrderMutation.mutate(verifyingOrder.id)}
-              disabled={verifyOrderMutation.isPending}
+              onClick={() => verifyingOrder && verifyOrderMutation.mutate({ orderId: verifyingOrder.id, verifiedBy: verifierName })}
+              disabled={verifyOrderMutation.isPending || !verifierName.trim()}
               data-testid="button-verify-order"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Verified ✅
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!completingOrder} onOpenChange={(open) => !open && setCompletingOrder(null)}>
+        <DialogContent data-testid="dialog-complete-order">
+          <DialogHeader>
+            <DialogTitle>Complete Order</DialogTitle>
+            <DialogDescription>
+              Enter your name to complete this order
+            </DialogDescription>
+          </DialogHeader>
+
+          {completingOrder && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium">Flight:</span>
+                  <span className="text-sm font-mono">{completingOrder.flightNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium">Trolley ID:</span>
+                  <span className="text-sm font-mono">{completingOrder.trolleyId}</span>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <label className="text-sm font-medium mb-2 block">Completed By (Employee Name)</label>
+                <Input
+                  value={employeeName}
+                  onChange={(e) => setEmployeeName(e.target.value)}
+                  placeholder="Enter your name"
+                  data-testid="input-employee-name"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCompletingOrder(null);
+                setEmployeeName("");
+              }}
+              data-testid="button-cancel-complete"
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+            <Button
+              onClick={() => completingOrder && completeOrderMutation.mutate({ orderId: completingOrder.id, completedBy: employeeName })}
+              disabled={completeOrderMutation.isPending || !employeeName.trim()}
+              data-testid="button-confirm-complete"
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              {completeOrderMutation.isPending ? "Processing..." : "Complete"}
             </Button>
           </DialogFooter>
         </DialogContent>

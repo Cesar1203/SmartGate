@@ -139,8 +139,9 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts Grid - Only show when demo data is loaded */}
+      {metrics && metrics.totalFlights > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Efficiency Trend */}
         <Card>
           <CardHeader>
@@ -265,7 +266,8 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      )}
 
       {/* Employee Performance Metrics */}
       {employeeMetrics && employeeMetrics.length > 0 && (
@@ -282,7 +284,7 @@ export default function Dashboard() {
                     <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Avg. Prep Time</th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Error Rate</th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Compliance</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Trolleys</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Trolleys / Week</th>
                   </tr>
                 </thead>
                 <tbody>
